@@ -7,12 +7,13 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="dao" />
-        <module name="ejb" />
+        <module name="ear" />
         <module name="web" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="dao" target="1.7" />
+      <module name="ear" target="1.7" />
       <module name="ejb" target="1.7" />
       <module name="ejbImages" target="1.7" />
       <module name="web" target="1.7" />

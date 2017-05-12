@@ -17,10 +17,21 @@
     <modules>
         <module>dao</module>
         <module>web</module>
-        <module>ejb</module>
+        <module>ear</module>
     </modules>
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>images</groupId>
+                <artifactId>dao</artifactId>
+                <type>ejb</type>
+            </dependency>
+            <dependency>
+                <groupId>images</groupId>
+                <artifactId>web</artifactId>
+                <type>war</type>
+                <scope>compile</scope>
+            </dependency>
             <dependency>
                 <groupId>org.wildfly.bom</groupId>
                 <artifactId>wildfly-javaee7</artifactId>
