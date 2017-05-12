@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="ear" name="ejbImages:ear">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="imageProject-1.0.ear">
+      <element id="artifact" artifact-name="ejbImages:ear exploded" />
+    </root>
+  </artifact>
+</component>
