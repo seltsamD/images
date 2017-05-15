@@ -1,2 +1,3 @@
+controller\ConfigRest.class
 test\TestRest.class
 test\ContentAppPathActivator.class

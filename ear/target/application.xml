@@ -5,12 +5,12 @@
 <application>
   <display-name>ear</display-name>
   <module>
+    <ejb>ejb.jar</ejb>
+  </module>
+  <module>
     <web>
       <web-uri>web.war</web-uri>
       <context-root>/web</context-root>
     </web>
-  </module>
-  <module>
-    <ejb>dao.jar</ejb>
   </module>
 </application>

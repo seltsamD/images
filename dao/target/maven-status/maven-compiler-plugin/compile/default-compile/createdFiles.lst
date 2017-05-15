@@ -1,3 +1,6 @@
-dao\ConfigDAO.class
+dao\impl\ConfigDaoImpl.class
+dao\ConfigDao.class
+dao\impl\BaseDaoImpl.class
 model\Config.class
+dao\BaseDao.class
 model\User.class

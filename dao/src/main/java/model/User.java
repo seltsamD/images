@@ -19,7 +19,10 @@ public class User implements Serializable {
     private String username;
 
     @Column
-    private String password_hash;
+    private String password;
+
+    @Column
+    private String role;
 
     public long getId() {
         return id;
@@ -37,35 +40,23 @@ public class User implements Serializable {
         this.username = username;
     }
 
-    public String getPassword_hash() {
-        return password_hash;
+    public String getRole() {
+        return role;
     }
 
-    public void setPassword_hash(String password_hash) {
-        this.password_hash = password_hash;
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public User() {
     }
 
-    public User(long id, String username, String password_hash) {
-        this.id = id;
-        this.username = username;
-        this.password_hash = password_hash;
+    public String getPassword() {
+        return password;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return id == user.id &&
-                Objects.equals(username, user.username) &&
-                Objects.equals(password_hash, user.password_hash);
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, username, password_hash);
-    }
 }

@@ -16,21 +16,31 @@
 
     <modules>
         <module>dao</module>
+        <module>ejb</module>
         <module>web</module>
         <module>ear</module>
+
     </modules>
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>images</groupId>
                 <artifactId>dao</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>images</groupId>
+                <artifactId>ejb</artifactId>
                 <type>ejb</type>
             </dependency>
             <dependency>
                 <groupId>images</groupId>
                 <artifactId>web</artifactId>
                 <type>war</type>
-                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>images</groupId>
+                <artifactId>ear</artifactId>
+                <type>ear</type>
             </dependency>
             <dependency>
                 <groupId>org.wildfly.bom</groupId>
@@ -40,11 +50,6 @@
                 <version>10.0.0.Final</version>
             </dependency>
 
-            <dependency>
-                <groupId>javax</groupId>
-                <artifactId>javaee-api</artifactId>
-                <scope>provided</scope>
-            </dependency>
         </dependencies>
 
     </dependencyManagement>
