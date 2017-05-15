@@ -6,5 +6,6 @@
 </head>
 <body>
 <h1>Admin index</h1>
+Hello, <%= request.getUserPrincipal() %>
 </body>
 </html>

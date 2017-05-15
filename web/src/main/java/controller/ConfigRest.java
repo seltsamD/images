@@ -35,14 +35,5 @@ public class ConfigRest {
     ) {
        configService.create(key, value);
     }
-//
-//    @GET
-//    @Path("/get")
-//    @Produces("application/json")
-//    public Object getByKey(
-//            @QueryParam("key") String key
-//    ) {
-//        return configDAO.getByKey(key);
-//    }
 
 }
