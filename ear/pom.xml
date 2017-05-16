@@ -43,7 +43,7 @@
                         <webModule>
                             <groupId>images</groupId>
                             <artifactId>web</artifactId>
-                            <contextRoot>/web</contextRoot>
+                            <contextRoot>/images</contextRoot>
                         </webModule>
                     </modules>
                 </configuration>

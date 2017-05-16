@@ -22,8 +22,7 @@
 <div class="alert alert-info" role="alert">
 <h2>Add new project</h2>
 <form action="rest/project/upload" method="post" enctype="multipart/form-data">
-    Project name: <input type="text" name="name" required><br>
-    <input type="file" name="file" accept=".xml" required/>
+    <input type="file" name="file" required/>
     <input type="submit" />
 </form>
 </div>

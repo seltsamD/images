@@ -6,9 +6,11 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import service.ProjectService;
 import service.UserService;
 
+import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import java.io.*;
@@ -16,7 +18,17 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import javax.jms.*;
 @Path("/project")
+@JMSDestinationDefinitions(
+        value =  {
+                @JMSDestinationDefinition(
+                        name = "java:/queue/ProjectQueue",
+                        interfaceName = "javax.jms.Queue",
+                        destinationName = "projectMDB"
+                )
+        }
+)
 public class ProjectRest {
     @Inject
     private UserService userService;
@@ -26,6 +38,9 @@ public class ProjectRest {
 
     @Context
     private SecurityContext context;
+
+    @Resource(mappedName = "java:/queue/ProjectQueue")
+    private Queue queue;
 
     @GET
     @Produces("application/json")
@@ -52,8 +67,22 @@ public class ProjectRest {
         long userId = userService.getIdByUsername(context.getUserPrincipal().getName());
         InputPart inPart = input.getFormDataMap().get("file").get(0);
         try {
-            String projectName = input.getFormDataPart("name", String.class, null);
             InputStream istream = inPart.getBody(InputStream.class, null);
+            String projectName = getFileName(inPart.getHeaders());
+
+
+            Connection connection = null;
+            try {
+                 Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+                MessageProducer messageProducer = (MessageProducer) session.createProducer(queue);
+                TextMessage textMessage = session.createTextMessage();
+                textMessage.setStringProperty("projectName", projectName);
+                messageProducer.send(textMessage);
+            } catch (JMSException e) {
+                e.printStackTrace();
+            }
+
+
             projectService.save(userId, projectName, istream);
         } catch (IOException e) {
             e.printStackTrace();
@@ -66,5 +95,21 @@ public class ProjectRest {
             e.printStackTrace();
         }
         return Response.seeOther(url).build();
+    }
+
+    private String getFileName(MultivaluedMap<String, String> header) {
+
+        String[] contentDisposition = header.getFirst("Content-Disposition").split(";");
+
+        for (String filename : contentDisposition) {
+            if ((filename.trim().startsWith("filename"))) {
+
+                String[] name = filename.split("=");
+
+                String finalFileName = name[1].trim().replaceAll("\"", "");
+                return finalFileName;
+            }
+        }
+        return "unknown";
     }
 }
