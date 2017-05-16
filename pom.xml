@@ -19,28 +19,25 @@
         <module>ejb</module>
         <module>web</module>
         <module>ear</module>
-
     </modules>
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>images</groupId>
                 <artifactId>dao</artifactId>
+                <version>1.0</version>
             </dependency>
             <dependency>
                 <groupId>images</groupId>
                 <artifactId>ejb</artifactId>
                 <type>ejb</type>
+                <version>1.0</version>
             </dependency>
             <dependency>
                 <groupId>images</groupId>
                 <artifactId>web</artifactId>
                 <type>war</type>
-            </dependency>
-            <dependency>
-                <groupId>images</groupId>
-                <artifactId>ear</artifactId>
-                <type>ear</type>
+                <version>1.0</version>
             </dependency>
             <dependency>
                 <groupId>org.wildfly.bom</groupId>
@@ -61,23 +58,10 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.6.1</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-    <!--<build>-->
-        <!--<finalName>images</finalName>-->
-        <!--<plugins>-->
-            <!--<plugin>-->
-                <!--<groupId>org.wildfly.plugins</groupId>-->
-                <!--<artifactId>wildfly-maven-plugin</artifactId>-->
-                <!--<version>${version.wildfly.maven.plugin}</version>-->
-                <!--<configuration>-->
-                    <!--<skip>true</skip>-->
-                <!--</configuration>-->
-            <!--</plugin>-->
-        <!--</plugins>-->
-    <!--</build>-->
 </project>

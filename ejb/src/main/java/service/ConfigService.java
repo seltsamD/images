@@ -1,15 +1,23 @@
 package service;
 
+import dao.ConfigDao;
 import model.Config;
 
-import javax.ejb.Remote;
+import javax.ejb.Stateless;
+import javax.inject.Inject;
 import java.util.List;
 
+@Stateless
+public class ConfigService{
 
-@Remote
-public interface ConfigService {
+    @Inject
+    private ConfigDao configDAO;
 
-    List<Config> findAll();
+    public List<Config> findAll() {
+        return configDAO.findAll();
+    }
 
-    void create(String key, String value);
+    public void create(String key, String value) {
+        configDAO.create(new Config(key, value));
+    }
 }

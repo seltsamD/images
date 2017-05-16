@@ -1,20 +1,39 @@
 package dao;
 
-
-import javax.ejb.Remote;
-import java.io.Serializable;
+import javax.persistence.EntityManager;
 import java.util.List;
 
-@Remote
-public interface BaseDao <T> {
+public abstract class BaseDao<T> {
+    public BaseDao(Class<T> tClass, EntityManager entityManager) {
+        this.tClass = tClass;
+        this.entityManager = entityManager;
+    }
 
-    void create(T newInstance);
+    protected Class<T> tClass;
+    protected EntityManager entityManager;
 
-    T findById(Class t, Object id);
+    public void create(T newInstance) {
+        entityManager.persist(newInstance);
+        entityManager.flush();
+    }
 
-    List<T> findAll(Class t);
 
-    void update(T transientObject);
+    public T findById(Object id) {
+        return (T) entityManager.find(tClass, id);
+    }
 
-    void delete(T persistentObject);
+
+    public List<T> findAll() {
+        return entityManager.createQuery("from " + tClass.getSimpleName(), tClass).getResultList();
+    }
+
+    public void update(T object) {
+        entityManager.merge(object);
+    }
+
+    public void delete(T object) {
+        entityManager.remove(object);
+    }
+
+
 }

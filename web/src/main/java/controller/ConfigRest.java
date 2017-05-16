@@ -1,29 +1,38 @@
 package controller;
 
-
-
 import model.Config;
 import service.ConfigService;
+import service.ProjectService;
+import service.UserService;
 
-import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.SecurityContext;
 import java.util.List;
 
-@Path("/rest/config")
+@Path("/config")
 public class ConfigRest {
 
-    @EJB
+    @Inject
     private ConfigService configService;
 
+    @Inject
+    private UserService userService;
+
+    @Inject
+    private ProjectService projectService;
+
+    @Context
+    private SecurityContext context;
 
     @GET
     @Path("/full")
     @Produces("application/json")
-    public List<?> findAll() {
+    public List<Config> findAll() {
         return configService.findAll();
     }
 
@@ -33,7 +42,7 @@ public class ConfigRest {
             @QueryParam("key") String key,
             @QueryParam("value") String value
     ) {
-       configService.create(key, value);
-    }
+        configService.create(key, value);
 
+    }
 }

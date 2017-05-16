@@ -2,5 +2,16 @@ package dao;
 
 import model.Config;
 
-public interface ConfigDao extends BaseDao<Config> {
+import javax.persistence.EntityManager;
+
+public class ConfigDao extends BaseDao<Config> {
+
+    public ConfigDao(EntityManager entityManager) {
+        super(Config.class, entityManager);
+    }
+
+    public Config getByKey(String key) {
+        return  entityManager.createQuery("from Config c where c.key = :k", Config.class).setParameter("k", key).getSingleResult();
+    }
+
 }

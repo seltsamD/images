@@ -1,14 +1,13 @@
 package model;
 
 import javax.persistence.*;
-import java.io.Serializable;
-import java.util.Objects;
-
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 
 
 @Entity
 @Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = "username"))
+@NamedQuery(name = "User.getIdByUsername", query = "select id from User u where u.username = :user_name")
 public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -48,7 +47,14 @@ public class User implements Serializable {
         this.role = role;
     }
 
+
     public User() {
+    }
+
+    public User(String username, String password, String role) {
+        this.username = username;
+        this.password = password;
+        this.role = role;
     }
 
     public String getPassword() {

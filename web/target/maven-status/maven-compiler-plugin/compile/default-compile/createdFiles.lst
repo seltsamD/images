@@ -1,0 +1,4 @@
+controller\ConfigRest.class
+controller\ContentAppPathActivator.class
+controller\ProjectRest.class
+controller\UserRest.class

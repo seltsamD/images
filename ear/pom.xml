@@ -18,24 +18,18 @@
         <dependency>
             <groupId>images</groupId>
             <artifactId>dao</artifactId>
-            <version>1.0</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>images</groupId>
             <artifactId>ejb</artifactId>
             <type>ejb</type>
-            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>images</groupId>
             <artifactId>web</artifactId>
             <type>war</type>
-            <version>1.0</version>
         </dependency>
-
-
-
     </dependencies>
     <build>
         <finalName>${project.parent.artifactId}</finalName>
@@ -45,10 +39,6 @@
                 <artifactId>maven-ear-plugin</artifactId>
                 <configuration>
                     <modules>
-                        <ejbModule>
-                            <groupId>images</groupId>
-                            <artifactId>ejb</artifactId>
-                        </ejbModule>
                         <webModule>
                             <groupId>images</groupId>
                             <artifactId>web</artifactId>
