@@ -35,9 +35,10 @@
         <finalName>${project.parent.artifactId}</finalName>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-ear-plugin</artifactId>
                 <configuration>
+                    <defaultLibBundleDir>lib/</defaultLibBundleDir>
+                    <skinnyWars>true</skinnyWars>
                     <modules>
                         <webModule>
                             <groupId>images</groupId>
@@ -45,9 +46,9 @@
                             <contextRoot>/web</contextRoot>
                         </webModule>
                     </modules>
-                    <fileNameMapping>no-version</fileNameMapping>
                 </configuration>
             </plugin>
         </plugins>
     </build>
+
 </project>

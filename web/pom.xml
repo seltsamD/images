@@ -18,13 +18,13 @@
         <dependency>
             <groupId>images</groupId>
             <artifactId>ejb</artifactId>
-            <version>1.0</version>
-            <!--<scope>provided</scope>-->
+            <type>ejb</type>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>images</groupId>
             <artifactId>dao</artifactId>
-            <!--<scope>provided</scope>-->
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.spec.javax.ws.rs</groupId>
