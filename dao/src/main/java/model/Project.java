@@ -1,6 +1,9 @@
 package model;
 
 
+import constants.ProjectConstants;
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -10,9 +13,9 @@ import java.util.Objects;
 @Entity
 @Table(name = "projects")
 @NamedQueries({
-        @NamedQuery(name = "Project.getByUser", query = "from Project where user_id = :id"),
-        @NamedQuery(name = "Project.findAllWithUser", query = "select project.id, project.projectName, project.date, user.username from Project project join project.user user "),
-        @NamedQuery(name = "Project.getUserByProject", query = "select user.id from Project project join project.user user where project.id = :id "),
+        @NamedQuery(name = ProjectConstants.getByUser, query = "from Project where user_id = :id"),
+        @NamedQuery(name = ProjectConstants.getUserByProject, query = "select p.user.id from Project p where p.id = :id "),
+        @NamedQuery(name = ProjectConstants.getByUsername, query = "select p from Project p where p.user.username = :name")
 })
 public class Project implements Serializable {
     @Id
@@ -30,7 +33,11 @@ public class Project implements Serializable {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
+
+    @Column
+    private String username;
 
     @PrePersist
     protected void onCreate() {
@@ -44,6 +51,7 @@ public class Project implements Serializable {
     public Project(String projectName, User user) {
         this.user = user;
         this.projectName = projectName;
+        this.username = user.getUsername();
     }
 
     public long getId() {
@@ -77,6 +85,14 @@ public class Project implements Serializable {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     @Override

@@ -20,15 +20,15 @@ import java.util.List;
 
 import javax.jms.*;
 @Path("/project")
-@JMSDestinationDefinitions(
-        value =  {
-                @JMSDestinationDefinition(
-                        name = "java:/queue/ProjectQueue",
-                        interfaceName = "javax.jms.Queue",
-                        destinationName = "projectMDB"
-                )
-        }
-)
+//@JMSDestinationDefinitions(
+//        value =  {
+//                @JMSDestinationDefinition(
+//                        name = "java:/queue/ProjectQueue",
+//                        interfaceName = "javax.jms.Queue",
+//                        destinationName = "projectMDB"
+//                )
+//        }
+//)
 public class ProjectRest {
     @Inject
     private UserService userService;
@@ -39,20 +39,23 @@ public class ProjectRest {
     @Context
     private SecurityContext context;
 
-    @Resource(mappedName = "java:/queue/ProjectQueue")
-    private Queue queue;
+//    @Resource(mappedName="java:/ConnectionFactory")
+//    private ConnectionFactory connectionFactory;
+//
+//    @Resource(mappedName = "java:/queue/ProjectQueue")
+//    private Queue queue;
 
     @GET
     @Produces("application/json")
     public List<Project> getByUser() {
-        return projectService.getByUser(userService.getIdByUsername(context.getUserPrincipal().getName()));
+        return projectService.getByUserName(context.getUserPrincipal().getName());
     }
 
     @GET
     @Path("/full")
     @Produces("application/json")
-    public List<Object> getAll() {
-        return projectService.findAllWithUser();
+    public List<Project> getAll() {
+        return projectService.findAll();
     }
 
     @DELETE
@@ -70,20 +73,21 @@ public class ProjectRest {
             InputStream istream = inPart.getBody(InputStream.class, null);
             String projectName = getFileName(inPart.getHeaders());
 
-
-            Connection connection = null;
-            try {
-                 Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-                MessageProducer messageProducer = (MessageProducer) session.createProducer(queue);
-                TextMessage textMessage = session.createTextMessage();
-                textMessage.setStringProperty("projectName", projectName);
-                messageProducer.send(textMessage);
-            } catch (JMSException e) {
-                e.printStackTrace();
-            }
+//
+//            Connection connection = null;
+//            try {
+//                 Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+//                MessageProducer messageProducer = (MessageProducer) session.createProducer(queue);
+//                TextMessage textMessage = session.createTextMessage();
+//                textMessage.setStringProperty("projectName", projectName);
+//                messageProducer.send(textMessage);
+//            } catch (JMSException e) {
+//                e.printStackTrace();
+//            }
 
 
             projectService.save(userId, projectName, istream);
+
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -7,7 +7,7 @@ $(function () {
             var obj = jQuery.parseJSON(JSON.stringify(result));
             $.each(obj, function (key, value) {
             var date = moment(value[2]).format("DD.MM.YYYY HH:mm");
-                $('#myProject tbody').append("<tr><td>"+value[0]+"</td><td>"+value[3]+"</td><td>"+value[1]+"</td><td>" + date+"</td></tr>");
+                $('#myProject tbody').append("<tr><td>"+value['id']+"</td><td>"+value['username']+"</td><td>"+value['projectName']+"</td><td>" + date+"</td></tr>");
             });
         }
     });

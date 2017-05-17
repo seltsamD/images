@@ -22,12 +22,12 @@ public class ProjectService {
     @Inject
     UserDao userDao;
 
-    public List<Object> findAllWithUser() {
-        return projectDao.findAllWithUser();
+    public List<Project> findAll() {
+        return projectDao.findAll();
     }
 
-    public List<Project> getByUser(long userId) {
-        return projectDao.getByUser(userId);
+    public List<Project> getByUserName(String username) {
+        return projectDao.getByUserName(username);
     }
 
     public void delete(long id) {

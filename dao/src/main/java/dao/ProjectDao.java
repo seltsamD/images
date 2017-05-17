@@ -1,6 +1,7 @@
 package dao;
 
 
+import constants.ProjectConstants;
 import model.Project;
 
 import javax.persistence.EntityManager;
@@ -18,15 +19,15 @@ public class ProjectDao extends BaseDao<Project> {
         return obj.getId();
     }
 
-    public List<Project> getByUser(long id) {
-        return entityManager.createNamedQuery("Project.getByUser", Project.class).setParameter("id", id).getResultList();
+    public List<Project> getByUserName(String username){
+        return entityManager.createNamedQuery(ProjectConstants.getByUsername, Project.class).setParameter("name", username).getResultList();
     }
 
-    public List<Object> findAllWithUser() {
-        return entityManager.createNamedQuery("Project.findAllWithUser").getResultList();
+    public List<Project> getByUser(long user_id) {
+        return entityManager.createNamedQuery(ProjectConstants.getByUser, Project.class).setParameter("id", user_id).getResultList();
     }
 
     public long getUserByProject(long id){
-        return entityManager.createNamedQuery("Project.getUserByProject",  Long.class).setParameter("id", id).getSingleResult();
+        return entityManager.createNamedQuery(ProjectConstants.getUserByProject,  Long.class).setParameter("id", id).getSingleResult();
     }
 }
