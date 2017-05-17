@@ -11,13 +11,14 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import static constants.ProjectConstants.LOCATION_FOLDER;
+
 @Stateless
 public class ProjectService {
 
     @Inject
     ProjectDao projectDao;
 
-    private static final String LOCATION_FOLDER = "C:/Users/dnakhod/Documents";
 
     @Inject
     UserDao userDao;
@@ -89,7 +90,7 @@ public class ProjectService {
             ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(fileName));
             ZipEntry entry = zipInputStream.getNextEntry();
             while (entry != null) {
-                BufferedOutputStream  outpuStreamZip = new BufferedOutputStream (new FileOutputStream(LOCATION_FOLDER + "/" + userId + "/" + name + "/" + entry.getName()));
+                BufferedOutputStream outpuStreamZip = new BufferedOutputStream(new FileOutputStream(LOCATION_FOLDER + "/" + userId + "/" + name + "/" + entry.getName()));
                 int readInZip = 0;
                 while ((readInZip = zipInputStream.read(bytes)) != -1) {
                     outpuStreamZip.write(bytes, 0, readInZip);
@@ -106,5 +107,41 @@ public class ProjectService {
             e.printStackTrace();
         }
 
+    }
+
+    public void savePreview(String userId, String projectName) {
+        File preview = new File(LOCATION_FOLDER + "/preview.jpg");
+        String name = projectName.substring(0, projectName.indexOf("."));
+        File copyFile = new File(LOCATION_FOLDER + "/" + userId + "/" + name + "/preview.jpg");
+
+        FileInputStream inStream = null;
+        try {
+            inStream = new FileInputStream(preview);
+            FileOutputStream outStream = new FileOutputStream(copyFile);
+            byte[] buffer = new byte[1024];
+
+            int length;
+            //copy the file content in bytes
+            while ((length = inStream.read(buffer)) > 0) {
+                outStream.write(buffer, 0, length);
+            }
+            inStream.close();
+            outStream.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    public File callPreview(String username, String projectName){
+        long userId = userDao.getIdByUsername(username);
+        File file = new File(LOCATION_FOLDER + "/" + userId + "/" + projectName + "/preview.jpg");
+        if(file.exists())
+            return file;
+
+        return null;
     }
 }

@@ -1,5 +1,6 @@
 package controller;
 
+import mdb.ProjectResourceMdb;
 import model.Project;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
@@ -7,12 +8,10 @@ import service.ProjectService;
 import service.UserService;
 
 import javax.annotation.Resource;
+import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.*;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -20,15 +19,6 @@ import java.util.List;
 
 import javax.jms.*;
 @Path("/project")
-//@JMSDestinationDefinitions(
-//        value =  {
-//                @JMSDestinationDefinition(
-//                        name = "java:/queue/ProjectQueue",
-//                        interfaceName = "javax.jms.Queue",
-//                        destinationName = "projectMDB"
-//                )
-//        }
-//)
 public class ProjectRest {
     @Inject
     private UserService userService;
@@ -39,11 +29,14 @@ public class ProjectRest {
     @Context
     private SecurityContext context;
 
-//    @Resource(mappedName="java:/ConnectionFactory")
-//    private ConnectionFactory connectionFactory;
-//
-//    @Resource(mappedName = "java:/queue/ProjectQueue")
-//    private Queue queue;
+    @EJB
+    ProjectResourceMdb resourceMdb;
+
+    @Resource(mappedName="java:/ConnectionFactory")
+    private ConnectionFactory connectionFactory;
+
+    @Resource(mappedName = "java:/jms/queue/projectQueue")
+    private Queue queue;
 
     @GET
     @Produces("application/json")
@@ -63,30 +56,48 @@ public class ProjectRest {
         projectService.delete(id);
     }
 
+    @GET
+    @Path("/call")
+    @Produces("image/jpg")
+    public Response  call(@QueryParam("username") String username, @QueryParam("projectname") String projectName) {
+        InputStream inputStream = null;
+        if( projectService.callPreview(username, projectName) == null)
+            return Response.status(404).build();
+        try {
+            inputStream = new FileInputStream(projectService.callPreview(username, projectName));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return Response.ok(inputStream).build();
+
+    }
+
     @POST
     @Path("/upload")
     @Consumes("multipart/form-data")
+    @Produces("application/json")
     public Response uploadFile(MultipartFormDataInput input) {
         long userId = userService.getIdByUsername(context.getUserPrincipal().getName());
+        String projectName = null;
+
         InputPart inPart = input.getFormDataMap().get("file").get(0);
         try {
             InputStream istream = inPart.getBody(InputStream.class, null);
-            String projectName = getFileName(inPart.getHeaders());
-
-//
-//            Connection connection = null;
-//            try {
-//                 Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-//                MessageProducer messageProducer = (MessageProducer) session.createProducer(queue);
-//                TextMessage textMessage = session.createTextMessage();
-//                textMessage.setStringProperty("projectName", projectName);
-//                messageProducer.send(textMessage);
-//            } catch (JMSException e) {
-//                e.printStackTrace();
-//            }
-
+            projectName = getFileName(inPart.getHeaders());
 
             projectService.save(userId, projectName, istream);
+
+            try {
+                Connection connection = connectionFactory.createConnection();
+                Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+                MessageProducer messageProducer = (MessageProducer) session.createProducer(queue);
+                TextMessage textMessage = session.createTextMessage();
+                textMessage.setStringProperty("userId", String.valueOf(userId));
+                textMessage.setStringProperty("projectName", projectName);
+                messageProducer.send(textMessage);
+            } catch (JMSException e) {
+                e.printStackTrace();
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
