@@ -1,8 +1,0 @@
-dao\ProjectDao.class
-model\Project.class
-dao\ConfigDao.class
-dao\DaoFactory.class
-dao\UserDao.class
-model\Config.class
-dao\BaseDao.class
-model\User.class
