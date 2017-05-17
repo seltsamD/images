@@ -7,6 +7,7 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = "username"))
+//TODO: Add constant query names like in Project entity
 @NamedQuery(name = "User.getIdByUsername", query = "select id from User u where u.username = :user_name")
 public class User implements Serializable {
     @Id

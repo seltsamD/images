@@ -1,7 +1,6 @@
 package model;
 
 
-import constants.ProjectConstants;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
 import javax.persistence.*;
@@ -13,11 +12,17 @@ import java.util.Objects;
 @Entity
 @Table(name = "projects")
 @NamedQueries({
-        @NamedQuery(name = ProjectConstants.getByUser, query = "from Project where user_id = :id"),
-        @NamedQuery(name = ProjectConstants.getUserByProject, query = "select p.user.id from Project p where p.id = :id "),
-        @NamedQuery(name = ProjectConstants.getByUsername, query = "select p from Project p where p.user.username = :name")
+        @NamedQuery(name = Project.GET_BY_USER, query = "from Project where user_id = :id"),
+        @NamedQuery(name = Project.GET_USER_BY_PROJECT, query = "select p.user.id from Project p where p.id = :id "),
+        @NamedQuery(name = Project.GET_BY_USERNAME, query = "from Project p where p.user.username = :name")
 })
+//TODO: constant names of queries should be created inside entity,
+// so it will be easier to understand relation of query to entity
 public class Project implements Serializable {
+    public static final String GET_BY_USER = "Project.getByUser";
+    public static final String GET_USER_BY_PROJECT = "Project.getUserByProject";
+    public static final String GET_BY_USERNAME = "Project.getByUsername";
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;

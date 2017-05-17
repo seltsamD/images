@@ -11,7 +11,7 @@ import java.util.List;
 public class UserService {
 
     @Inject
-    UserDao userDao;
+    private UserDao userDao;
 
     public long getIdByUsername(String username) {
         return userDao.getIdByUsername(username);

@@ -9,6 +9,8 @@ import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "configs", uniqueConstraints = @UniqueConstraint(columnNames = "key"))
+//TODO: Add named query here
+//TODO: Add constant query names like in Project entity
 public class Config implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
