@@ -1,7 +1,6 @@
 package service;
 
 import cdi.ProjectRepository;
-import cdi.CDIProjectsFactory;
 import cdi.ProjectRepositoryFactory;
 import dao.ProjectDao;
 import dao.UserDao;
@@ -11,8 +10,10 @@ import model.User;
 import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
-import javax.jms.*;
-import java.io.*;
+import javax.jms.ConnectionFactory;
+import javax.jms.Queue;
+import java.io.File;
+import java.io.InputStream;
 import java.util.List;
 
 import static constants.ProjectConstants.LOCATION_FOLDER;
@@ -48,14 +49,19 @@ public class ProjectService {
     public void delete(long id) {
         Project project = projectDao.findById(id);
 
+        //TODO: next lines should handled by projectRepository
+        //projectsFactory.create(user, project).delete();
+        //projectDao.delete(project);
 
         File folder = new File(LOCATION_FOLDER + "/" + project.getUser().getId() + "/" + project.getProjectName());
+
         deleteFolder(folder);
         File file = new File(LOCATION_FOLDER + "/" + project.getUser().getId() + "/" + project.getProjectName() + ".zip");
         file.delete();
         projectDao.delete(project);
     }
 
+    //TODO: recursive function is fine but we have better way FileUtils.deleteDirectory();
     public static void deleteFolder(File folder) {
         File[] files = folder.listFiles();
         if (files != null) { //some JVMs return null for empty dirs
@@ -71,6 +77,7 @@ public class ProjectService {
     }
 
     public void save(long userId, String fileName, InputStream inputStream) {
+        //TODO fileName.substring(0, fileName.indexOf(".")) replace with FilenameUtils.getBaseName()
         Project project = projectDao.save(fileName.substring(0, fileName.indexOf(".")), userDao.findById(userId));
         User user = userDao.findById(userId);
 
@@ -85,7 +92,7 @@ public class ProjectService {
         projectsFactory.create(user, project).savePreview();
     }
 
-
+    //TODO: rename to getPreviewFile
     public File callPreview(String username, String projectName){
         User user = userDao.findByUsername(username);
         Project project = projectDao.getByProjectName(projectName);

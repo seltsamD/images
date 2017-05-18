@@ -2,22 +2,18 @@ package cdi;
 
 
 import dao.ProjectDao;
-import dao.UserDao;
-import model.Project;
 import org.apache.commons.io.IOUtils;
 
 import javax.inject.Inject;
-
 import java.io.*;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import static constants.ProjectConstants.LOCATION_FOLDER;
-
+//TODO; move to repository package inside DAO module, its also DAO just for files
 public class ProjectRepository {
 
+    //TODO; inject unused, remove this
     @Inject
     ProjectDao projectDao;
 

@@ -22,6 +22,8 @@ public class Project implements Serializable {
     public static final String GET_USER_BY_PROJECT = "Project.getUserByProject";
     public static final String GET_BY_USERNAME = "Project.getByUsername";
     public static final String GET_BY_PROJECTNAME = "Project.getByProjectName";
+
+    //TODO: let Entities have only constants for Queries
     public static final String ROOT_PATH = "rootPath";
 
     @Id

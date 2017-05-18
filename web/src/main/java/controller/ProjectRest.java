@@ -9,9 +9,15 @@ import service.UserService;
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.ws.rs.*;
-import javax.ws.rs.core.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Base64;
@@ -51,6 +57,18 @@ public class ProjectRest {
     @Produces("image/png")
     public Response call(@QueryParam("username") String username, @QueryParam("projectname") String projectName) {
         InputStream inputStream = null;
+        //TODO: projectService should have another method for hide all of this encoding, getPreviewBody or something like that
+        /*byte [] previewBody =projectService.getPreviewBody(username, projectName);
+        if(previewBody==null)
+            return Response.noContent().build();
+        return Response.ok(previewBody).build();*/
+
+        //Or you can wrap to static util method response of projectService.callPreview()
+        /*byte [] previewBody = readBody(projectService.callPreview(username, projectName));
+        if(previewBody==null)
+            return Response.noContent().build();
+        return Response.ok(previewBody).build();*/
+
         File file = projectService.callPreview(username, projectName);
         if (file == null)
             return Response.noContent().build();
@@ -99,6 +117,7 @@ public class ProjectRest {
         return Response.seeOther(url).build();
     }
 
+    //TODO: move to some util class
     private String getFileName(MultivaluedMap<String, String> header) {
 
         String[] contentDisposition = header.getFirst("Content-Disposition").split(";");

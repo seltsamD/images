@@ -1,16 +1,11 @@
 package cdi;
 
-import constants.ProjectConstants;
-import dao.ConfigDao;
-import model.Project;
 import service.ConfigService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Properties;
 
+//TODO: remove this, we have ConfigService, it`s the same
 @Singleton
 public class ConfigurationBean {
 
@@ -18,8 +13,8 @@ public class ConfigurationBean {
     ConfigService configService;
 
     public String getRootPath(){
-            String rootPath = configService.getRootPath();
+        String rootPath = configService.getRootPath();
 
-            return rootPath;
+        return rootPath;
     }
 }

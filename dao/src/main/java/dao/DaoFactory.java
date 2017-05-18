@@ -4,6 +4,8 @@ import javax.enterprise.inject.Produces;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+//TODO: move factory to factory package inside ejb module
+//TODO: let names of factories for CDI container starts with Cdi prefix
 public class DaoFactory {
 
     @PersistenceContext(unitName = "punit")

@@ -9,7 +9,6 @@ import javax.inject.Inject;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
-import javax.jms.Session;
 
 @MessageDriven(name = "projectMDB", activationConfig = {
         @ActivationConfigProperty(propertyName = "destinationLookup", propertyValue = "java:/jms/queue/projectQueue"),
@@ -25,6 +24,7 @@ public class ProjectResourceMdb implements MessageListener {
         try {
         String userId = inMessage.getStringProperty("userId");
         String projectName = inMessage.getStringProperty("projectName");
+            //TODO: its better to rename it to create/generate Preview
         projectService.savePreview(userId, projectName);
         } catch (JMSException e) {
             e.printStackTrace();
