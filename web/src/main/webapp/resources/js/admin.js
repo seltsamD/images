@@ -26,6 +26,7 @@ $.ajax({
 
 
     $('#addUserBtn').click(function (){
+
     var user = {
     username: $('#username').val(),
     password: $('#password').val(),

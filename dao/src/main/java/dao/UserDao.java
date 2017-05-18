@@ -13,8 +13,7 @@ public class UserDao extends BaseDao<User> {
     }
 
     public long getIdByUsername(String username) {
-        //TODO: call query name from User entity
-        return  entityManager.createNamedQuery("User.getIdByUsername", Long.class).setParameter("user_name", username).getSingleResult();
+        return  entityManager.createNamedQuery(User.GET_ID_BY_USERNAME, Long.class).setParameter("user_name", username).getSingleResult();
     }
 
     public User save(User user){

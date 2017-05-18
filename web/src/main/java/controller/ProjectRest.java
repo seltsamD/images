@@ -6,20 +6,15 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import service.ProjectService;
 import service.UserService;
 
-import javax.annotation.Resource;
+import javax.imageio.ImageIO;
 import javax.inject.Inject;
-import javax.jms.*;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.ws.rs.core.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Base64;
 import java.util.List;
 
 @Path("/project")
@@ -32,17 +27,6 @@ public class ProjectRest {
 
     @Context
     private SecurityContext context;
-
-
-    //TODO: replace all work with messages to EJB module, get rid of jms, ejb dependency in WEB module.
- /*   @EJB
-    ProjectResourceMdb resourceMdb;*/
-
-    @Resource(mappedName = "java:/ConnectionFactory")
-    private ConnectionFactory connectionFactory;
-
-    @Resource(mappedName = "java:/jms/queue/projectQueue")
-    private Queue queue;
 
     @GET
     @Produces("application/json")
@@ -64,17 +48,29 @@ public class ProjectRest {
 
     @GET
     @Path("/call")
-    @Produces("image/jpg")
+    @Produces("image/png")
     public Response call(@QueryParam("username") String username, @QueryParam("projectname") String projectName) {
         InputStream inputStream = null;
-        if (projectService.callPreview(username, projectName) == null)
-            return Response.status(404).build();
+        File file = projectService.callPreview(username, projectName);
+        if (file == null)
+            return Response.noContent().build();
         try {
-            inputStream = new FileInputStream(projectService.callPreview(username, projectName));
+            inputStream = new FileInputStream(file);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        return Response.ok(inputStream).build();
+        byte[] imageData = null;
+        try {
+            BufferedImage image = ImageIO.read(file);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(image, "png", baos);
+            imageData = Base64.getEncoder().encode(baos.toByteArray());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return Response.ok(imageData).build();
+
 
     }
 
@@ -92,18 +88,6 @@ public class ProjectRest {
             projectName = getFileName(inPart.getHeaders());
 
             projectService.save(userId, projectName, istream);
-
-            try {
-                Connection connection = connectionFactory.createConnection();
-                Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-                MessageProducer messageProducer = (MessageProducer) session.createProducer(queue);
-                TextMessage textMessage = session.createTextMessage();
-                textMessage.setStringProperty("userId", String.valueOf(userId));
-                textMessage.setStringProperty("projectName", projectName);
-                messageProducer.send(textMessage);
-            } catch (JMSException e) {
-                e.printStackTrace();
-            }
 
         } catch (IOException e) {
             e.printStackTrace();

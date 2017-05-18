@@ -11,8 +11,7 @@ public class ConfigDao extends BaseDao<Config> {
     }
 
     public Config getByKey(String key) {
-        //TODO: move query to Config entity
-        return  entityManager.createQuery("from Config c where c.key = :k", Config.class).setParameter("k", key).getSingleResult();
+        return  entityManager.createNamedQuery(Config.GET_BY_KEY, Config.class).setParameter("k", key).getSingleResult();
     }
 
 }

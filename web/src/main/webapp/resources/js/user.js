@@ -6,10 +6,11 @@ $(function () {
         success: function (result) {
             var obj = jQuery.parseJSON(JSON.stringify(result));
             $.each(obj, function (key, value) {
-            callPreview(value['username'], value['projectName'], value['id']);
+
 
             var date = moment(value['date']).format("DD.MM.YYYY HH:mm");
                 $('#myProject tbody').append("<tr><td><div id='preview"+value['id']+"'></div></td><td>"+value['projectName']+"</td><td>" + date+"</td><td> <span onclick='remove("+value['id']+")' class='glyphicon glyphicon glyphicon-remove'></span></td></tr>");
+                callPreview(value['username'], value['projectName'], value['id']);
             });
         }
     });
@@ -32,10 +33,12 @@ function callPreview(username, projectName, id){
         url: "rest/project/call?username="+username+"&projectname="+projectName,
         async: false
     }).done(function(result){
-        if(result.length == 0)
+        if(result == null)
              setTimeout(function(){callPreview(username, projectName, id);}, 100);
-         else
-             $('#preview'+id).html(result);
+         else{
+       $('#preview'+id).html('<img height="70px" width="80px" src="data:image/png;base64,' + result + '" />');
+         }
+
         });
 
 }

@@ -37,7 +37,7 @@
 <c:if test="${pageContext.request.isUserInRole('ADMIN')}">
 <div class="alert alert-info" role="alert">
 <h2>Add user</h2>
-<form id="addUserForm">
+<form id="addUserForm" method="post">
     Username: <input type="text" name="username" id="username" required><br>
     Password: <input type="password" name="password" id="password" required><br>
     <input type="radio" name="role" value="ADMIN">Admin

@@ -16,8 +16,6 @@ import java.util.Objects;
         @NamedQuery(name = Project.GET_USER_BY_PROJECT, query = "select p.user.id from Project p where p.id = :id "),
         @NamedQuery(name = Project.GET_BY_USERNAME, query = "from Project p where p.user.username = :name")
 })
-//TODO: constant names of queries should be created inside entity,
-// so it will be easier to understand relation of query to entity
 public class Project implements Serializable {
     public static final String GET_BY_USER = "Project.getByUser";
     public static final String GET_USER_BY_PROJECT = "Project.getUserByProject";

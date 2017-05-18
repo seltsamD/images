@@ -4,8 +4,10 @@ import dao.ProjectDao;
 import dao.UserDao;
 import model.Project;
 
+import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import javax.jms.*;
 import java.io.*;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -19,9 +21,16 @@ public class ProjectService {
     @Inject
     ProjectDao projectDao;
 
-
     @Inject
     UserDao userDao;
+
+
+    @Resource(mappedName = "java:/ConnectionFactory")
+    private ConnectionFactory connectionFactory;
+
+    @Resource(mappedName = "java:/jms/queue/projectQueue")
+    private Queue queue;
+
 
     public List<Project> findAll() {
         return projectDao.findAll();
@@ -102,6 +111,19 @@ public class ProjectService {
             zipInputStream.closeEntry();
             zipInputStream.close();
 
+            try {
+                Connection connection = connectionFactory.createConnection();
+                Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+                MessageProducer messageProducer = (MessageProducer) session.createProducer(queue);
+                TextMessage textMessage = session.createTextMessage();
+                textMessage.setStringProperty("userId", String.valueOf(userId));
+                textMessage.setStringProperty("projectName", projectName);
+                messageProducer.send(textMessage);
+            } catch (JMSException e) {
+                e.printStackTrace();
+            }
+
+
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -110,9 +132,9 @@ public class ProjectService {
     }
 
     public void savePreview(String userId, String projectName) {
-        File preview = new File(LOCATION_FOLDER + "/preview.jpg");
+        File preview = new File(LOCATION_FOLDER + "/preview.png");
         String name = projectName.substring(0, projectName.indexOf("."));
-        File copyFile = new File(LOCATION_FOLDER + "/" + userId + "/" + name + "/preview.jpg");
+        File copyFile = new File(LOCATION_FOLDER + "/" + userId + "/" + name + "/preview.png");
 
         FileInputStream inStream = null;
         try {
@@ -121,7 +143,6 @@ public class ProjectService {
             byte[] buffer = new byte[1024];
 
             int length;
-            //copy the file content in bytes
             while ((length = inStream.read(buffer)) > 0) {
                 outStream.write(buffer, 0, length);
             }
@@ -138,7 +159,7 @@ public class ProjectService {
 
     public File callPreview(String username, String projectName){
         long userId = userDao.getIdByUsername(username);
-        File file = new File(LOCATION_FOLDER + "/" + userId + "/" + projectName + "/preview.jpg");
+        File file = new File(LOCATION_FOLDER + "/" + userId + "/" + projectName + "/preview.png");
         if(file.exists())
             return file;
 

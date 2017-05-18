@@ -9,9 +9,11 @@ import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "configs", uniqueConstraints = @UniqueConstraint(columnNames = "key"))
-//TODO: Add named query here
-//TODO: Add constant query names like in Project entity
+@NamedQueries({
+        @NamedQuery(name = Config.GET_BY_KEY, query = "from Project where user_id = :id")
+})
 public class Config implements Serializable {
+    public static final String GET_BY_KEY = "Config.getByKey";
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
