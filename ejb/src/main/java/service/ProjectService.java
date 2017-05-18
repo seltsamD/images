@@ -1,8 +1,12 @@
 package service;
 
+import cdi.ProjectRepository;
+import cdi.CDIProjectsFactory;
+import cdi.ProjectRepositoryFactory;
 import dao.ProjectDao;
 import dao.UserDao;
 import model.Project;
+import model.User;
 
 import javax.annotation.Resource;
 import javax.ejb.Stateless;
@@ -10,8 +14,6 @@ import javax.inject.Inject;
 import javax.jms.*;
 import java.io.*;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import static constants.ProjectConstants.LOCATION_FOLDER;
 
@@ -30,6 +32,9 @@ public class ProjectService {
 
     @Resource(mappedName = "java:/jms/queue/projectQueue")
     private Queue queue;
+
+    @Inject
+    private ProjectRepositoryFactory projectsFactory;
 
 
     public List<Project> findAll() {
@@ -65,104 +70,25 @@ public class ProjectService {
         folder.delete();
     }
 
-    public void save(long userId, String projectName, InputStream inputStream) {
-        String fileName = null;
+    public void save(long userId, String fileName, InputStream inputStream) {
+        Project project = projectDao.save(fileName.substring(0, fileName.indexOf(".")), userDao.findById(userId));
+        User user = userDao.findById(userId);
 
-        try {
-
-            File directory = new File(LOCATION_FOLDER + "/" + userId);
-            if (!directory.exists()) {
-                directory.mkdir();
-            }
-            String name = projectName.substring(0, projectName.indexOf("."));
-            long projectId = projectDao.save(new Project(name, userDao.findById(userId)));
-            fileName = LOCATION_FOLDER + "/" + userId + "/" + projectName;
-
-            //save zip
-            OutputStream outpuStream = new FileOutputStream(new File(fileName));
-            int read = 0;
-            byte[] bytes = new byte[4096];
-            while ((read = inputStream.read(bytes)) != -1) {
-                outpuStream.write(bytes, 0, read);
-            }
-            outpuStream.flush();
-            outpuStream.close();
-
-            //create dir and unzip
-
-
-            File directoryZip = new File(LOCATION_FOLDER + "/" + userId + "/" + name);
-            if (!directoryZip.exists()) {
-                directoryZip.mkdir();
-            }
-
-            ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(fileName));
-            ZipEntry entry = zipInputStream.getNextEntry();
-            while (entry != null) {
-                BufferedOutputStream outpuStreamZip = new BufferedOutputStream(new FileOutputStream(LOCATION_FOLDER + "/" + userId + "/" + name + "/" + entry.getName()));
-                int readInZip = 0;
-                while ((readInZip = zipInputStream.read(bytes)) != -1) {
-                    outpuStreamZip.write(bytes, 0, readInZip);
-                }
-                outpuStreamZip.close();
-
-                entry = zipInputStream.getNextEntry();
-            }
-            zipInputStream.closeEntry();
-            zipInputStream.close();
-
-            try {
-                Connection connection = connectionFactory.createConnection();
-                Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-                MessageProducer messageProducer = (MessageProducer) session.createProducer(queue);
-                TextMessage textMessage = session.createTextMessage();
-                textMessage.setStringProperty("userId", String.valueOf(userId));
-                textMessage.setStringProperty("projectName", projectName);
-                messageProducer.send(textMessage);
-            } catch (JMSException e) {
-                e.printStackTrace();
-            }
-
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        ProjectRepository projectRepository = projectsFactory.create(user, project);
+        projectRepository.saveProjectArchive(inputStream);
 
     }
 
-    public void savePreview(String userId, String projectName) {
-        File preview = new File(LOCATION_FOLDER + "/preview.png");
-        String name = projectName.substring(0, projectName.indexOf("."));
-        File copyFile = new File(LOCATION_FOLDER + "/" + userId + "/" + name + "/preview.png");
-
-        FileInputStream inStream = null;
-        try {
-            inStream = new FileInputStream(preview);
-            FileOutputStream outStream = new FileOutputStream(copyFile);
-            byte[] buffer = new byte[1024];
-
-            int length;
-            while ((length = inStream.read(buffer)) > 0) {
-                outStream.write(buffer, 0, length);
-            }
-            inStream.close();
-            outStream.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+    public void savePreview(String user_id, String projectName){
+        User user = userDao.findById(user_id);
+        Project project = projectDao.getByProjectName(projectName);
+        projectsFactory.create(user, project).savePreview();
     }
 
 
     public File callPreview(String username, String projectName){
-        long userId = userDao.getIdByUsername(username);
-        File file = new File(LOCATION_FOLDER + "/" + userId + "/" + projectName + "/preview.png");
-        if(file.exists())
-            return file;
-
-        return null;
+        User user = userDao.findByUsername(username);
+        Project project = projectDao.getByProjectName(projectName);
+        return projectsFactory.create(user, project).callPreview();
     }
 }

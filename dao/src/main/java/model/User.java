@@ -7,9 +7,14 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = "username"))
-@NamedQuery(name = User.GET_ID_BY_USERNAME, query = "select id from User u where u.username = :user_name")
+@NamedQueries({
+        @NamedQuery(name = User.GET_ID_BY_USERNAME, query = "select id from User u where u.username = :user_name"),
+        @NamedQuery(name = User.GET_BY_USERNAME, query = "from User u where u.username = :user_name")
+})
 public class User implements Serializable {
     public static final String GET_ID_BY_USERNAME = "User.getIdByUsername";
+    public static final String GET_BY_USERNAME = "User.getByUsername";
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;

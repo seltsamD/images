@@ -3,6 +3,7 @@ package dao;
 import model.Config;
 
 import javax.persistence.EntityManager;
+import java.util.List;
 
 public class ConfigDao extends BaseDao<Config> {
 
@@ -11,7 +12,10 @@ public class ConfigDao extends BaseDao<Config> {
     }
 
     public Config getByKey(String key) {
-        return  entityManager.createNamedQuery(Config.GET_BY_KEY, Config.class).setParameter("k", key).getSingleResult();
+        List<Config> result = entityManager.createNamedQuery(Config.GET_BY_KEY, Config.class).setParameter("k", key).getResultList();
+        if(result.size() == 0)
+            return null;
+        return result.get(0);
     }
 
 }

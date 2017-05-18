@@ -21,4 +21,8 @@ public class UserDao extends BaseDao<User> {
         entityManager.flush();
         return user;
     }
+
+    public User findByUsername(String username){
+        return  entityManager.createNamedQuery(User.GET_BY_USERNAME, User.class).setParameter("user_name", username).getSingleResult();
+    }
 }

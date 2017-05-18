@@ -14,12 +14,15 @@ import java.util.Objects;
 @NamedQueries({
         @NamedQuery(name = Project.GET_BY_USER, query = "from Project where user_id = :id"),
         @NamedQuery(name = Project.GET_USER_BY_PROJECT, query = "select p.user.id from Project p where p.id = :id "),
-        @NamedQuery(name = Project.GET_BY_USERNAME, query = "from Project p where p.user.username = :name")
+        @NamedQuery(name = Project.GET_BY_USERNAME, query = "from Project p where p.user.username = :name"),
+        @NamedQuery(name = Project.GET_BY_PROJECTNAME, query = "from Project p where p.projectName = :name")
 })
 public class Project implements Serializable {
     public static final String GET_BY_USER = "Project.getByUser";
     public static final String GET_USER_BY_PROJECT = "Project.getUserByProject";
     public static final String GET_BY_USERNAME = "Project.getByUsername";
+    public static final String GET_BY_PROJECTNAME = "Project.getByProjectName";
+    public static final String ROOT_PATH = "rootPath";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

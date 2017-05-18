@@ -46,6 +46,13 @@
                             <contextRoot>/images</contextRoot>
                         </webModule>
                     </modules>
+                    <archive>
+                        <manifestEntries>
+                            <dependencies>
+                                org.apache.commons.io
+                            </dependencies>
+                        </manifestEntries>
+                    </archive>
                 </configuration>
             </plugin>
         </plugins>

@@ -54,11 +54,7 @@ public class ProjectRest {
         File file = projectService.callPreview(username, projectName);
         if (file == null)
             return Response.noContent().build();
-        try {
-            inputStream = new FileInputStream(file);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+
         byte[] imageData = null;
         try {
             BufferedImage image = ImageIO.read(file);
@@ -88,6 +84,7 @@ public class ProjectRest {
             projectName = getFileName(inPart.getHeaders());
 
             projectService.save(userId, projectName, istream);
+
 
         } catch (IOException e) {
             e.printStackTrace();

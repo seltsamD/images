@@ -2,6 +2,7 @@ package dao;
 
 
 import model.Project;
+import model.User;
 
 import javax.persistence.EntityManager;
 import java.util.List;
@@ -12,10 +13,14 @@ public class ProjectDao extends BaseDao<Project> {
         super(Project.class, entityManager);
     }
 
-    public long save(Project obj) {
-        entityManager.persist(obj);
+    public Project save(String projectName, User user) {
+        Project project = new Project();
+        project.setProjectName(projectName);
+        project.setUser(user);
+        project.setUsername(user.getUsername());
+        entityManager.persist(project);
         entityManager.flush();
-        return obj.getId();
+        return project;
     }
 
     public List<Project> getByUserName(String username) {
@@ -28,5 +33,9 @@ public class ProjectDao extends BaseDao<Project> {
 
     public long getUserByProject(long id) {
         return entityManager.createNamedQuery(Project.GET_USER_BY_PROJECT, Long.class).setParameter("id", id).getSingleResult();
+    }
+
+    public Project getByProjectName(String name){
+        return entityManager.createNamedQuery(Project.GET_BY_PROJECTNAME, Project.class).setParameter("name", name).getSingleResult();
     }
 }

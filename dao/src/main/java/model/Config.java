@@ -10,7 +10,7 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "configs", uniqueConstraints = @UniqueConstraint(columnNames = "key"))
 @NamedQueries({
-        @NamedQuery(name = Config.GET_BY_KEY, query = "from Project where user_id = :id")
+        @NamedQuery(name = Config.GET_BY_KEY, query = "from Config where key = :k")
 })
 public class Config implements Serializable {
     public static final String GET_BY_KEY = "Config.getByKey";
