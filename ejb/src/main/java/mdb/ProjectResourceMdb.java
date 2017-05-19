@@ -24,7 +24,7 @@ public class ProjectResourceMdb implements MessageListener {
         try {
             String userId = inMessage.getStringProperty("userId");
             String projectName = inMessage.getStringProperty("projectName");
-            projectService.generatePreview(userId, projectName);
+//            projectService.generatePreview(userId, projectName);
         } catch (JMSException e) {
             e.printStackTrace();
         }

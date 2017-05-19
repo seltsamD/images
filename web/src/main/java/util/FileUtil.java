@@ -10,11 +10,8 @@ public class FileUtil {
 
         for (String filename : contentDisposition) {
             if ((filename.trim().startsWith("filename"))) {
-
                 String[] name = filename.split("=");
-
-                String finalFileName = name[1].trim().replaceAll("\"", "");
-                return finalFileName;
+                return name[1].trim().replaceAll("\"", "");
             }
         }
         return "unknown";

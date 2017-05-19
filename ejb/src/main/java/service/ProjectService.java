@@ -52,13 +52,14 @@ public class ProjectService {
         User user = userDao.findById(userId);
         ProjectRepository projectRepository = projectsFactory.create(user, project);
         projectRepository.saveProjectArchive(inputStream);
+//        projectRepository.savePreview();
 
     }
 
     public void generatePreview(String user_id, String projectName) {
         User user = userDao.findById(user_id);
         Project project = projectDao.getByProjectName(projectName);
-        projectsFactory.create(user, project).savePreview();
+//        projectsFactory.create(user, project).savePreview();
     }
 
     public byte[] getPreviewBody(String username, String projectName) {

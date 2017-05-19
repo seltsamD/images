@@ -1,8 +1,8 @@
 package factory;
 
-import repository.ProjectRepository;
 import model.Project;
 import model.User;
+import repository.ProjectRepository;
 
 public class CDIProjectRepositoryFactory {
     private String rootPath;

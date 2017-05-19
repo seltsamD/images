@@ -21,21 +21,17 @@ public class ConfigService {
     private void init() {
         this.properties = new Properties();
         try {
-            String path = this.getClass().getResourceAsStream("../file.properties").toString();
             properties.load(this.getClass().getResourceAsStream("../file.properties"));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public String get(String key){
+    public String get(String key) {
         return Optional.ofNullable(configDAO.getByKey(key))
                 .map(Config::getValue)
                 .orElse(properties.getProperty(key));
     }
-
-    //TODO: for our case its better to use more generic methods, make it more like Map =)
-    // String get(String s)/Integer getInteger(String s)/Double getDouble(String s)
 
     public List<Config> findAll() {
         return configDAO.findAll();
