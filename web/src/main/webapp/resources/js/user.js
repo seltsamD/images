@@ -34,9 +34,9 @@ function callPreview(username, projectName, id){
         async: false
     }).done(function(result){
         if(result == null)
-             setTimeout(function(){callPreview(username, projectName, id);}, 100);
+             setTimeout(function(){callPreview(username, projectName, id);}, 1000);
          else{
-       $('#preview'+id).html('<img height="70px" width="80px" src="data:image/png;base64,' + result + '" />');
+             $('#preview'+id).html('<img height="70px" width="80px" src="data:image/png;base64,' + result + '" />');
          }
 
         });

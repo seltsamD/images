@@ -1,14 +1,14 @@
-package cdi;
+package factory;
 
+import repository.ProjectRepository;
 import model.Project;
 import model.User;
 
-//TODO; move to repository package inside DAO module, its also DAO just for files
-public class ProjectRepositoryFactory {
+public class CDIProjectRepositoryFactory {
     private String rootPath;
 
 
-    public ProjectRepositoryFactory(String rootPath) {
+    public CDIProjectRepositoryFactory(String rootPath) {
         this.rootPath = rootPath;
     }
 

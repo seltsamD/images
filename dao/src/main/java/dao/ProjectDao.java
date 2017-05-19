@@ -38,4 +38,8 @@ public class ProjectDao extends BaseDao<Project> {
     public Project getByProjectName(String name){
         return entityManager.createNamedQuery(Project.GET_BY_PROJECTNAME, Project.class).setParameter("name", name).getSingleResult();
     }
+
+    public boolean isUniqueName(String projectName) {
+        return entityManager.createNamedQuery(Project.IS_UNIQUE_NAME, Long.class).setParameter("name", projectName).getSingleResult() == 0;
+    }
 }

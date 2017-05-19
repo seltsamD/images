@@ -13,5 +13,7 @@
             <property name="hibernate.format_sql" value="true"/>
         </properties>
         <class>model.User</class>
+        <class>model.Config</class>
+        <class>model.Project</class>
     </persistence-unit>
 </persistence>

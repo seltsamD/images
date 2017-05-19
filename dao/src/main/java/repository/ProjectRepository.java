@@ -1,21 +1,16 @@
-package cdi;
+package repository;
 
 
-import dao.ProjectDao;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
-import javax.inject.Inject;
 import java.io.*;
 import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-//TODO; move to repository package inside DAO module, its also DAO just for files
-public class ProjectRepository {
 
-    //TODO; inject unused, remove this
-    @Inject
-    ProjectDao projectDao;
+public class ProjectRepository {
 
     private long userId;
     private String rootPath;
@@ -44,13 +39,14 @@ public class ProjectRepository {
             }
 
             //create dir and unzip
-            File archiveDirectory = fileName = Paths.get(rootPath).resolve(String.valueOf(userId)).resolve(projectName).toFile();
+            File archiveDirectory = Paths.get(rootPath).resolve(String.valueOf(userId)).resolve(projectName).toFile();
 
             if (!archiveDirectory.exists()) {
                 archiveDirectory.mkdir();
             }
 
             try(ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(fileName))){
+
                 ZipEntry entry = zipInputStream.getNextEntry();
                 while (entry != null) {
                     File fileInArchive = Paths.get(rootPath).resolve(String.valueOf(userId)).resolve(projectName).resolve(entry.getName()).toFile();
@@ -66,6 +62,8 @@ public class ProjectRepository {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+            savePreview();
 
     }
 
@@ -88,5 +86,14 @@ public class ProjectRepository {
             return file;
 
         return null;
+    }
+
+    public void deleteProject(){
+        try {
+            FileUtils.deleteDirectory(Paths.get(rootPath).resolve(String.valueOf(userId)).resolve(projectName).toFile());
+            Paths.get(rootPath).resolve(String.valueOf(userId)).resolve(projectName + ".zip").toFile().delete();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

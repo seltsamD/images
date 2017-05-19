@@ -15,16 +15,15 @@ import java.util.Objects;
         @NamedQuery(name = Project.GET_BY_USER, query = "from Project where user_id = :id"),
         @NamedQuery(name = Project.GET_USER_BY_PROJECT, query = "select p.user.id from Project p where p.id = :id "),
         @NamedQuery(name = Project.GET_BY_USERNAME, query = "from Project p where p.user.username = :name"),
-        @NamedQuery(name = Project.GET_BY_PROJECTNAME, query = "from Project p where p.projectName = :name")
+        @NamedQuery(name = Project.GET_BY_PROJECTNAME, query = "from Project p where p.projectName = :name"),
+        @NamedQuery(name = Project.IS_UNIQUE_NAME, query = "select count(id) from Project p where p.projectName = :name"),
 })
 public class Project implements Serializable {
     public static final String GET_BY_USER = "Project.getByUser";
     public static final String GET_USER_BY_PROJECT = "Project.getUserByProject";
     public static final String GET_BY_USERNAME = "Project.getByUsername";
     public static final String GET_BY_PROJECTNAME = "Project.getByProjectName";
-
-    //TODO: let Entities have only constants for Queries
-    public static final String ROOT_PATH = "rootPath";
+    public static final String IS_UNIQUE_NAME = "Project.isUniqueName";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

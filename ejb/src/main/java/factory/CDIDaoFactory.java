@@ -1,12 +1,15 @@
-package dao;
+package factory;
+
+import dao.ConfigDao;
+import dao.ProjectDao;
+import dao.UserDao;
 
 import javax.enterprise.inject.Produces;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-//TODO: move factory to factory package inside ejb module
-//TODO: let names of factories for CDI container starts with Cdi prefix
-public class DaoFactory {
+
+public class CDIDaoFactory {
 
     @PersistenceContext(unitName = "punit")
     private EntityManager dao;

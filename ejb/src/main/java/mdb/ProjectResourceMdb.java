@@ -22,10 +22,9 @@ public class ProjectResourceMdb implements MessageListener {
 
     public void onMessage(Message inMessage) {
         try {
-        String userId = inMessage.getStringProperty("userId");
-        String projectName = inMessage.getStringProperty("projectName");
-            //TODO: its better to rename it to create/generate Preview
-        projectService.savePreview(userId, projectName);
+            String userId = inMessage.getStringProperty("userId");
+            String projectName = inMessage.getStringProperty("projectName");
+            projectService.generatePreview(userId, projectName);
         } catch (JMSException e) {
             e.printStackTrace();
         }
