@@ -40,6 +40,9 @@ public class Project implements Serializable {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id")
+    //TODO: remove json annotation, remove username column
+    //this annotation is second sign that we should use dto for custom json representation of this object
+    //first sign is username field
     @JsonIgnore
     private User user;
 

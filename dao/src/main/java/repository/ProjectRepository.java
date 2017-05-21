@@ -11,7 +11,6 @@ import javax.imageio.ImageIO;
 import javax.xml.bind.JAXBException;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
 import java.io.*;
 import java.nio.file.Paths;
 import java.util.List;
@@ -33,7 +32,14 @@ public class ProjectRepository {
         this.projectName = projectName;
     }
 
+    //TODO: remove from this method  2 other methods
+    // method name is not describe what this method do
+    //saveProjectArchive actually should only save zip and that`s all
+    // you could crated another method, unzipToProject(InputStream inputStream)
+    // violation of SRP
     public void saveProjectArchive(InputStream inputStream) {
+        //TODO: move base project path resolving to constructor,, and save it like Path type
+        // this line will be duplicated in each method, DRY principle violation
         File directory = Paths.get(rootPath).resolve(String.valueOf(userId)).toFile();
 
         if (!directory.exists()) {
@@ -57,10 +63,14 @@ public class ProjectRepository {
         }
 
         try {
+
             ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(fileName));
+
             ZipEntry entry = zipInputStream.getNextEntry();
             while (entry != null) {
+                //TODO: replace this fileInArchive with call function File getFile(String name);
                 File fileInArchive = Paths.get(rootPath).resolve(String.valueOf(userId)).resolve(projectName).resolve(entry.getName()).toFile();
+                //TODO: use IOUtils for this
                 try (BufferedOutputStream outpuStreamZip = new BufferedOutputStream(new FileOutputStream(fileInArchive))) {
                     int readInZip = 0;
                     byte[] bytes = new byte[4096];
@@ -80,6 +90,8 @@ public class ProjectRepository {
 
     }
 
+    //TODO: move from repository to ejb module
+    // we talk about this, its just notification =)
     public void generateThumbnail(File dir) {
 
 
@@ -163,6 +175,8 @@ public class ProjectRepository {
 
     }
 
+    //TODO: method should just create path for usage but not generate thumbnail
+    //violation of SRP
     public File saveThumbnail(String name, int height, int width) {
 
         File result = null;
@@ -201,7 +215,9 @@ public class ProjectRepository {
 
     public void deleteProject() {
         try {
+            //TODO: use deleteQuietly, it does not throw exceptions
             FileUtils.deleteDirectory(Paths.get(rootPath).resolve(String.valueOf(userId)).resolve(projectName).toFile());
+            //TODO: useless after directory remove, delete it
             Paths.get(rootPath).resolve(String.valueOf(userId)).resolve(projectName + ".zip").toFile().delete();
         } catch (IOException e) {
             e.printStackTrace();

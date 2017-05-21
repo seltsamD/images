@@ -1,11 +1,18 @@
 package JAXB;
 
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import java.util.Set;
+//TODO rename it to Block field like other fields (ImageField, TextField), for having standard name pattern for fields
+//TODO inherit base properties from abstract Field class, acc. with DRY principle
+//https://gist.github.com/blowder/dbc944d351abb4461735f0b912845be0
 
+//TODO:create 2 packages inside model, "db" and "xml" and move there appropriate model class, for better organization of class structure
+//package JAXB its xml model
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Block{
-
 
     @XmlAttribute(name = "x")
     private int x;

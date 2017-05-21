@@ -23,10 +23,10 @@ import java.util.List;
 public class ProjectService {
 
     @Inject
-    ProjectDao projectDao;
+    private ProjectDao projectDao;
 
     @Inject
-    UserDao userDao;
+    private UserDao userDao;
 
     @Inject
     private CDIProjectRepositoryFactory projectsFactory;

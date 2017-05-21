@@ -3,6 +3,8 @@ package JAXB;
 import javax.xml.bind.annotation.*;
 import java.util.Set;
 
+//TODO: rename it to Project,
+//
 @XmlRootElement(name = "project")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class UserProject {

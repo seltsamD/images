@@ -7,6 +7,7 @@ import service.ConfigService;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 
+//TODO: rename it to CDIProjectRepositoryFactory
 public class CDIProjectsFactory {
 
     @Inject
