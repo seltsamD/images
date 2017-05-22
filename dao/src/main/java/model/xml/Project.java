@@ -5,10 +5,16 @@ import java.util.Set;
 
 @XmlRootElement(name = "project")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Project extends Field{
+public class Project {
 
     @XmlAttribute(name = "name")
     private String name;
+
+    @XmlAttribute
+    private int width;
+
+    @XmlAttribute
+    private int height;
 
     @XmlElement(name = "text")
     private Set<TextField> textFields;
@@ -29,6 +35,21 @@ public class Project extends Field{
         this.name = name;
     }
 
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
 
     public Set<TextField> getTextFields() {
         return textFields;

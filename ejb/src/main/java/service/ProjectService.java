@@ -32,6 +32,7 @@ public class ProjectService {
     @Inject
     private CDIProjectRepositoryFactory projectsFactory;
 
+    //TODO; read, comments inside PreviewGenerator, use Inject here
     PreviewGenerator previewGenerator;
 
     @Inject ConfigService configService;

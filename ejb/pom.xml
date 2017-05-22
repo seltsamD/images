@@ -39,6 +39,7 @@
             <artifactId>commons-io</artifactId>
             <scope>provided</scope>
         </dependency>
+        <!--TODO: read comments inside CDIDaoFactory and remove this =( -->
         <dependency>
             <groupId>org.hibernate.javax.persistence</groupId>
             <artifactId>hibernate-jpa-2.1-api</artifactId>

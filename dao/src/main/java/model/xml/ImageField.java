@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ImageField extends Field{
-
+    //TODO: remove (name = "someName") if someName is name of the annotated field
     @XmlAttribute(name = "imageRef")
     private String imageRef;
 

@@ -1,10 +1,10 @@
 package generator;
 
-import model.xml.Project;
 import canvas.Canvas;
 import canvas.Canvas2D;
 import model.xml.BlockField;
 import model.xml.ImageField;
+import model.xml.Project;
 import model.xml.TextField;
 import processor.Graphic2DProcessor;
 import processor.ImageProcessor;
@@ -18,16 +18,20 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 public class PreviewGenerator {
+    //TODO: make it private
     Canvas canvas;
     Project project;
     ProjectRepository repository;
     ImageProcessor imageProcessor;
 
+
+    //TODO: lets rework this bean, make it as cdi bean
+    // add @Injects of Canvas and ImageProcessor here
     public PreviewGenerator(ProjectRepository repository, ConfigService configService) {
         this.repository = repository;
         File xmlFile = repository.getXML();
         try {
-            this.project = (Project) ProjectUtils.getObject(xmlFile, Project.class);
+            this.project = ProjectUtils.getObject(xmlFile, Project.class);
         } catch (JAXBException e) {
             e.printStackTrace();
         }
@@ -40,7 +44,7 @@ public class PreviewGenerator {
 
     }
 
-
+    //TODO: let generate() will have ProjectRepo as argument and call prepareImages() func on this repo
     public void generate() {
         if (project.getImageFields() != null)
             for (ImageField image : project.getImageFields()) {
@@ -66,6 +70,7 @@ public class PreviewGenerator {
 
     }
 
+    //TODO: let prepareImages() will have ProjectRepo as argument, and make it private
     public void prepareImages() {
         if (project.getImageFields() != null)
             for (ImageField image : project.getImageFields()) {
@@ -79,6 +84,7 @@ public class PreviewGenerator {
             }
     }
 
+    //TODO: make it private
     public void prepareInBlock(BlockField block) {
         if (block.getImageFields() != null)
             for (ImageField image : block.getImageFields()) {

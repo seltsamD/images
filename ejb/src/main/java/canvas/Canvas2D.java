@@ -1,17 +1,14 @@
 package canvas;
 
 import javax.imageio.ImageIO;
-import javax.imageio.stream.ImageInputStream;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
-import java.awt.image.RenderedImage;
-import java.awt.image.WritableRaster;
 import java.io.*;
 
 import static java.awt.Color.BLACK;
 
 public class Canvas2D implements Canvas {
+    //TODO: make it private
     Graphics2D graphics;
     BufferedImage image;
 
