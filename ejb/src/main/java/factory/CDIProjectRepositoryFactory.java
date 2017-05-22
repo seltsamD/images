@@ -1,20 +1,20 @@
 package factory;
 
-import model.Project;
-import model.User;
-import repository.ProjectRepository;
 
-//TODO: replace this to repository package inside dao, rename it to ProjectRepositoryFactory
-// this class is not maneged by CDI container
+import util.PropertyKeys;
+import service.ConfigService;
+
+import javax.enterprise.inject.Produces;
+import javax.inject.Inject;
+
 public class CDIProjectRepositoryFactory {
-    private String rootPath;
 
+    @Inject
+    ConfigService configService;
 
-    public CDIProjectRepositoryFactory(String rootPath) {
-        this.rootPath = rootPath;
+    @Produces
+    public ProjectRepositoryFactory createFactory() {
+        return new ProjectRepositoryFactory(configService.get(PropertyKeys.ROOT_PATH));
     }
 
-    public ProjectRepository create(User user, Project project) {
-        return new ProjectRepository(user.getId(), rootPath, project.getProjectName());
-    }
 }

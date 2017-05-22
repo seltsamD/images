@@ -1,6 +1,6 @@
 package controller;
 
-import model.Config;
+import model.db.Config;
 import service.ConfigService;
 import service.ProjectService;
 import service.UserService;
@@ -36,13 +36,4 @@ public class ConfigRest {
         return configService.findAll();
     }
 
-    @GET
-    @Path("/add")
-    public void add(
-            @QueryParam("key") String key,
-            @QueryParam("value") String value
-    ) {
-        configService.create(key, value);
-
-    }
 }

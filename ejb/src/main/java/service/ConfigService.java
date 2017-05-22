@@ -1,7 +1,7 @@
 package service;
 
 import dao.ConfigDao;
-import model.Config;
+import model.db.Config;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -25,7 +25,6 @@ public class ConfigService {
         try {
             properties.load(this.getClass().getResourceAsStream("../file.properties"));
         } catch (IOException e) {
-            //TODO: add JBOSS logging system for log exceptions
             e.printStackTrace();
         }
     }
@@ -36,14 +35,16 @@ public class ConfigService {
                 .orElse(properties.getProperty(key));
     }
 
+    public boolean getBoolean(String key){
+
+       String result = Optional.ofNullable(configDAO.getByKey(key))
+                .map(Config::getValue)
+                .orElse(properties.getProperty(key));
+        return Boolean.parseBoolean(result);
+    }
+
     public List<Config> findAll() {
         return configDAO.findAll();
     }
 
-    public void create(String key, String value) {
-        //TODO: remove next line, in our case property is like fallback default settings,
-        //we don`t need to save there some data
-        properties.put(key, value);
-        configDAO.create(new Config(key, value));
-    }
 }

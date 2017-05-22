@@ -1,82 +1,73 @@
 package repository;
 
 
-import JAXB.*;
-import JAXB.TextField;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
 import javax.imageio.ImageIO;
-import javax.xml.bind.JAXBException;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import static java.awt.Color.BLACK;
-
 
 public class ProjectRepository {
 
-    private long userId;
-    private String rootPath;
     private String projectName;
+    private Path projectDirectory;
+    private Path userDirectory;
+    private File previewFile;
 
     public ProjectRepository(long userId, String rootPath, String projectName) {
-        this.userId = userId;
-        this.rootPath = rootPath;
         this.projectName = projectName;
+        this.userDirectory = Paths.get(rootPath).resolve(String.valueOf(userId)).toAbsolutePath();
+        this.projectDirectory = userDirectory.resolve(projectName).toAbsolutePath();
+        this.previewFile = projectDirectory.resolve("preview.png").toFile();
+
+        if (!userDirectory.toFile().exists()) {
+            userDirectory.toFile().mkdir();
+        }
+        if (!projectDirectory.toFile().exists()) {
+            projectDirectory.toFile().mkdir();
+        }
+        File folder = getFile("thumbnails");
+        if (!folder.exists()) {
+            folder.mkdir();
+        }
+
     }
 
-    //TODO: remove from this method  2 other methods
-    // method name is not describe what this method do
-    //saveProjectArchive actually should only save zip and that`s all
-    // you could crated another method, unzipToProject(InputStream inputStream)
-    // violation of SRP
-    public void saveProjectArchive(InputStream inputStream) {
-        //TODO: move base project path resolving to constructor,, and save it like Path type
-        // this line will be duplicated in each method, DRY principle violation
-        File directory = Paths.get(rootPath).resolve(String.valueOf(userId)).toFile();
-
-        if (!directory.exists()) {
-            directory.mkdir();
-        }
-        File fileName = Paths.get(rootPath).resolve(String.valueOf(userId)).resolve(projectName + ".zip").toFile();
-
-        //save archive
+     File saveProjectZip(InputStream inputStream) {
+        File fileName = userDirectory.resolve(projectName + ".zip").toFile();
         try (InputStream is = inputStream;
              OutputStream fos = new FileOutputStream(fileName)) {
             IOUtils.copy(is, fos);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return fileName;
+    }
 
-        //create dir and unzip
-        File archiveDirectory = Paths.get(rootPath).resolve(String.valueOf(userId)).resolve(projectName).toFile();
 
-        if (!archiveDirectory.exists()) {
-            archiveDirectory.mkdir();
-        }
+    File getFile(String name) {
+        return projectDirectory.resolve(name).toFile();
+    }
 
+    public void unzipProject(InputStream inputStream) {
+        File file = saveProjectZip(inputStream);
         try {
 
-            ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(fileName));
+            ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(file));
 
             ZipEntry entry = zipInputStream.getNextEntry();
             while (entry != null) {
-                //TODO: replace this fileInArchive with call function File getFile(String name);
-                File fileInArchive = Paths.get(rootPath).resolve(String.valueOf(userId)).resolve(projectName).resolve(entry.getName()).toFile();
-                //TODO: use IOUtils for this
+                File fileInArchive = getFile(entry.getName());
                 try (BufferedOutputStream outpuStreamZip = new BufferedOutputStream(new FileOutputStream(fileInArchive))) {
-                    int readInZip = 0;
-                    byte[] bytes = new byte[4096];
-                    while ((readInZip = zipInputStream.read(bytes)) != -1) {
-                        outpuStreamZip.write(bytes, 0, readInZip);
-                    }
+                    IOUtils.copy(zipInputStream, outpuStreamZip);
                 }
                 entry = zipInputStream.getNextEntry();
             }
@@ -84,129 +75,44 @@ public class ProjectRepository {
             e.printStackTrace();
         }
 
-
-        generateThumbnail(archiveDirectory);
-
-
     }
 
-    //TODO: move from repository to ejb module
-    // we talk about this, its just notification =)
-    public void generateThumbnail(File dir) {
-
-
+    public File getXML() {
         String[] filter = new String[]{"xml"};
-        List<File> files = (List<File>) FileUtils.listFiles(dir, filter, true);
-        File xmlFile = files.get(0);
+        List<File> files = (List<File>) FileUtils.listFiles(projectDirectory.toFile(), filter, true);
+        return files.get(0);
+    }
 
-        ProjectParser projectParser = new ProjectParser();
+    public File getPathForThumbnail(String name, int height, int width) {
+        String filename = FilenameUtils.getBaseName(name) + "_" + width + "_" + height + "." + FilenameUtils.getExtension(name);
+        return projectDirectory.resolve("thumbnails").resolve(filename).toFile();
+    }
+
+    public File getImagePathForThumbnail(String name) {
+       return getFile(name);
+    }
+
+
+    public void saveImage(File result, String name) {
         try {
-            UserProject project = (UserProject) projectParser.getObject(xmlFile, UserProject.class);
-
-            BufferedImage imageBI = new BufferedImage(project.getWidth(), project.getHeight(), BufferedImage.TYPE_INT_ARGB);
-            Graphics2D graphics = imageBI.createGraphics();
-            if (project.getTextFields() != null)
-                for (TextField textField : project.getTextFields()) {
-                    graphics.setPaint(BLACK);
-                    graphics.drawString(textField.getValue(), textField.getX(), textField.getY());
-                }
-
-
-            if (project.getImageFields() != null)
-                for (ImageField image : project.getImageFields()) {
-                    File file = saveThumbnail(image.getImageRef(), image.getHeight(), image.getWidth());
-                    BufferedImage buf = ImageIO.read(file);
-                    graphics.drawImage(buf, image.getX(), image.getY(), image.getWidth(), image.getHeight(), null);
-                }
-            for (Block block : project.getBlocks()) {
-                if (block.getImageFields() != null)
-                    for (ImageField image : block.getImageFields()) {
-                        File file = saveThumbnail(image.getImageRef(), image.getHeight(), image.getWidth());
-                        BufferedImage buf = ImageIO.read(file);
-                        graphics.drawImage(buf, image.getX(), image.getY(), image.getWidth(), image.getHeight(), null);
-                    }
-            }
-
-
-            File previewToProject = Paths.get(rootPath).resolve(String.valueOf(userId)).resolve(projectName).resolve("preview.png").toFile();
-
-            try (OutputStream fis = new FileOutputStream(previewToProject)) {
-                ImageIO.write(imageBI, "png", previewToProject);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-//
-        } catch (JAXBException e) {
-            e.printStackTrace();
+            BufferedImage buf = ImageIO.read(result);
+            ImageIO.write(buf, FilenameUtils.getExtension(name), result);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-//        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-//        DocumentBuilder dBuilder = null;
-//        try {
-//            dBuilder = dbFactory.newDocumentBuilder();
-//            Document doc = dBuilder.parse(file.get(0));
-//            doc.getDocumentElement().normalize();
-//            Node project = doc.getElementsByTagName("project").item(0);
-//            Element projectElement = (Element) project;
-//            String name = projectElement.getAttribute("name");
-//            int height = Integer.parseInt(projectElement.getAttribute("height"));
-//            int width = Integer.parseInt(projectElement.getAttribute("width"));
-//
-//            BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-//            Graphics2D graphics = image.createGraphics();
-//            graphics.setPaint(new Color(0, 255, 10));
-//            graphics.fillRect(0,0, width, height);
-//            RenderedImage rendImage = image;
-//            File previewToProject = Paths.get(rootPath).resolve(String.valueOf(userId)).resolve(projectName).resolve("preview.png").toFile();
-//
-//            try (OutputStream fis = new FileOutputStream(previewToProject)) {
-//                ImageIO.write(rendImage, "png", previewToProject);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//
-//
-//        } catch (ParserConfigurationException | IOException | SAXException e) {
-//            e.printStackTrace();
-//        }
-
-
     }
 
-    //TODO: method should just create path for usage but not generate thumbnail
-    //violation of SRP
-    public File saveThumbnail(String name, int height, int width) {
 
-        File result = null;
-        File folder = Paths.get(rootPath).resolve(String.valueOf(userId)).resolve(projectName).resolve("thumbnails").toFile();
-        if (!folder.exists()) {
-            folder.mkdir();
-        }
-        File file = Paths.get(rootPath).resolve(String.valueOf(userId)).resolve(projectName).resolve(name).toFile();
-        BufferedImage image = null;
-        try {
-            image = ImageIO.read(file);
-            BufferedImage outputImage = new BufferedImage(width, height, image.getType());
-            Graphics2D graphics2D = outputImage.createGraphics();
-            graphics2D.drawImage(image, 0, 0, width, height, null);
-            graphics2D.dispose();
-            String filename = FilenameUtils.getBaseName(name) + "_" + width + "_" + height + "." + FilenameUtils.getExtension(name);
-            result = Paths.get(rootPath).resolve(String.valueOf(userId)).resolve(projectName).resolve("thumbnails").resolve(filename).toFile();
-            ImageIO.write(outputImage, FilenameUtils.getExtension(name), result);
-
+    public void savePreview(InputStream is){
+        try (OutputStream fos = new FileOutputStream(previewFile)) {
+            IOUtils.copy(is, fos);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        return result;
-
     }
-
 
     public File callPreview() {
-        File file = Paths.get(rootPath).resolve(String.valueOf(userId)).resolve(projectName).resolve("preview.png").toFile();
+        File file = getFile("preview.png");
         if (file.exists())
             return file;
 
@@ -214,13 +120,9 @@ public class ProjectRepository {
     }
 
     public void deleteProject() {
-        try {
-            //TODO: use deleteQuietly, it does not throw exceptions
-            FileUtils.deleteDirectory(Paths.get(rootPath).resolve(String.valueOf(userId)).resolve(projectName).toFile());
-            //TODO: useless after directory remove, delete it
-            Paths.get(rootPath).resolve(String.valueOf(userId)).resolve(projectName + ".zip").toFile().delete();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        FileUtils.deleteQuietly(projectDirectory.toFile());
+        FileUtils.deleteQuietly(userDirectory.resolve(projectName + ".zip").toFile());
     }
+
+
 }

@@ -1,6 +1,6 @@
 package controller;
 
-import model.Project;
+import model.db.Project;
 import org.apache.commons.io.FilenameUtils;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
@@ -8,21 +8,15 @@ import service.ProjectService;
 import service.UserService;
 import util.FileUtil;
 
-import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Base64;
 import java.util.List;
 
 @Path("/project")

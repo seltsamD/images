@@ -3,8 +3,9 @@ package service;
 import dao.ProjectDao;
 import dao.UserDao;
 import factory.CDIProjectRepositoryFactory;
-import model.Project;
-import model.User;
+import generator.PreviewGenerator;
+import model.db.Project;
+import model.db.User;
 import org.apache.commons.io.FilenameUtils;
 import repository.ProjectRepository;
 
@@ -31,6 +32,10 @@ public class ProjectService {
     @Inject
     private CDIProjectRepositoryFactory projectsFactory;
 
+    PreviewGenerator previewGenerator;
+
+    @Inject ConfigService configService;
+
 
     public List<Project> findAll() {
         return projectDao.findAll();
@@ -42,7 +47,7 @@ public class ProjectService {
 
     public void delete(long id) {
         Project project = projectDao.findById(id);
-        projectsFactory.create(project.getUser(), project).deleteProject();
+        projectsFactory.createFactory().create(project.getUser(), project).deleteProject();
         projectDao.delete(project);
     }
 
@@ -50,22 +55,19 @@ public class ProjectService {
     public void save(long userId, String fileName, InputStream inputStream) {
         Project project = projectDao.save(FilenameUtils.getBaseName(fileName), userDao.findById(userId));
         User user = userDao.findById(userId);
-        ProjectRepository projectRepository = projectsFactory.create(user, project);
-        projectRepository.saveProjectArchive(inputStream);
-//        projectRepository.savePreview();
+        ProjectRepository projectRepository = projectsFactory.createFactory().create(user, project);
+        projectRepository.unzipProject(inputStream);
+        previewGenerator = new PreviewGenerator(projectRepository, configService);
+        previewGenerator.prepareImages();
+        previewGenerator.generate();
 
     }
 
-    public void generatePreview(String user_id, String projectName) {
-        User user = userDao.findById(user_id);
-        Project project = projectDao.getByProjectName(projectName);
-//        projectsFactory.create(user, project).savePreview();
-    }
 
     public byte[] getPreviewBody(String username, String projectName) {
         User user = userDao.findByUsername(username);
         Project project = projectDao.getByProjectName(projectName);
-        File file = projectsFactory.create(user, project).callPreview();
+        File file = projectsFactory.createFactory().create(user, project).callPreview();
         if (file == null || !file.exists())
             return null;
 

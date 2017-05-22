@@ -1,8 +1,8 @@
 package dao;
 
 
-import model.Project;
-import model.User;
+import model.db.Project;
+import model.db.User;
 
 import javax.persistence.EntityManager;
 import java.util.List;
@@ -17,7 +17,6 @@ public class ProjectDao extends BaseDao<Project> {
         Project project = new Project();
         project.setProjectName(projectName);
         project.setUser(user);
-        project.setUsername(user.getUsername());
         entityManager.persist(project);
         entityManager.flush();
         return project;

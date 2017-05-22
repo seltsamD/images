@@ -22,12 +22,6 @@
             <artifactId>cdi-api</artifactId>
             <scope>provided</scope>
         </dependency>
-        <!--TODO: remove this dependency-->
-        <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-jackson-provider</artifactId>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>org.hibernate.javax.persistence</groupId>
             <artifactId>hibernate-jpa-2.1-api</artifactId>

@@ -1,7 +1,4 @@
-package model;
-
-
-import org.codehaus.jackson.annotate.JsonIgnore;
+package model.db;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
@@ -40,14 +37,9 @@ public class Project implements Serializable {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id")
-    //TODO: remove json annotation, remove username column
-    //this annotation is second sign that we should use dto for custom json representation of this object
-    //first sign is username field
-    @JsonIgnore
+
     private User user;
 
-    @Column
-    private String username;
 
     @PrePersist
     protected void onCreate() {
@@ -61,7 +53,6 @@ public class Project implements Serializable {
     public Project(String projectName, User user) {
         this.user = user;
         this.projectName = projectName;
-        this.username = user.getUsername();
     }
 
     public long getId() {
@@ -97,13 +88,6 @@ public class Project implements Serializable {
         this.user = user;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
 
     @Override
     public boolean equals(Object o) {

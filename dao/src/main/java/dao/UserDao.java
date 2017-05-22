@@ -1,10 +1,9 @@
 package dao;
 
 
-import model.User;
+import model.db.User;
 
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 public class UserDao extends BaseDao<User> {
 

@@ -12,8 +12,8 @@
             <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.format_sql" value="true"/>
         </properties>
-        <class>model.User</class>
-        <class>model.Config</class>
-        <class>model.Project</class>
+        <class>model.db.User</class>
+        <class>model.db.Config</class>
+        <class>model.db.Project</class>
     </persistence-unit>
 </persistence>

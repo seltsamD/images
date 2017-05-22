@@ -6,11 +6,9 @@ $(function () {
         success: function (result) {
             var obj = jQuery.parseJSON(JSON.stringify(result));
             $.each(obj, function (key, value) {
-
-
             var date = moment(value['date']).format("DD.MM.YYYY HH:mm");
                 $('#myProject tbody').append("<tr><td><div id='preview"+value['id']+"'></div></td><td>"+value['projectName']+"</td><td>" + date+"</td><td> <span onclick='remove("+value['id']+")' class='glyphicon glyphicon glyphicon-remove'></span></td></tr>");
-                callPreview(value['username'], value['projectName'], value['id']);
+                callPreview(value['user']['username'], value['projectName'], value['id']);
             });
         }
     });

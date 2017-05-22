@@ -1,6 +1,6 @@
 package controller;
 
-import model.User;
+import model.db.User;
 import service.UserService;
 
 import javax.inject.Inject;
