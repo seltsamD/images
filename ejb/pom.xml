@@ -37,13 +37,15 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <!--<scope>provided</scope>-->
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging</artifactId>
             <scope>provided</scope>
         </dependency>
+        <!--TODO: declare this dependency and appropriate repositories inside parent pom-->
+        <!--TODO: delete version of lib-->
         <dependency>
             <groupId>com.bfo</groupId>
             <artifactId>bfopdf</artifactId>

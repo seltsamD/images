@@ -2,18 +2,19 @@ package canvas;
 
 import model.xml.Project;
 import org.jboss.logging.Logger;
-import repository.ProjectRepository;
 
 import javax.enterprise.inject.Alternative;
 import javax.imageio.ImageIO;
-import javax.inject.Qualifier;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Paths;
 
 import static java.awt.Color.BLACK;
 
+//TODO: remove Alternative and create qualifier for one of Canvas implementations
 @Alternative
 public class Canvas2D implements Canvas {
 
@@ -48,6 +49,9 @@ public class Canvas2D implements Canvas {
         }
     }
 
+    //TODO: set first argument ProjectRepository
+    // after that you could just call
+    // ImageIO.write(image, "png", new FileOutputStream(repo.getPreview(PNG_TYPE)));
     @Override
     public void build(File file) {
         try {

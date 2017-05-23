@@ -12,6 +12,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
 
+//TODO: remove Alternative and create qualifier for one of Canvas implementations
 @Alternative
 public class CanvasBFO implements Canvas {
     private PDF pdf;
@@ -50,12 +51,16 @@ public class CanvasBFO implements Canvas {
         }
     }
 
-
+    //TODO: set first argument ProjectRepository
+    // after that you could just call
+    // pdf.render(new FileOutputStream(repo.getPreview(PDF_TYPE));
     @Override
     public void build(File file) {
         try (FileOutputStream stream = new FileOutputStream(Paths.get(file.toURI()).resolve("preview.pdf").toFile())) {
             page.drawCanvas(canvas, 0, 0, canvas.getWidth(), canvas.getHeight());
             pdf.render(stream);
+            //TODO: pdf objects its some kind of closable it is important to close() it
+            // use IOUtils.closeQuietly();
         } catch (IOException e) {
             LOGGER.error("Error at process of build preview PDF" + e.getMessage());
         }

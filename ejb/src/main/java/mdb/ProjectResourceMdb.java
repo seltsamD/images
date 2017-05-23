@@ -33,6 +33,7 @@ public class ProjectResourceMdb implements MessageListener {
     @Inject
     private ProjectRepositoryFactory servicesFactory;
 
+    //TODO: make it private
     @Inject
     PreviewGenerator previewGenerator;
 

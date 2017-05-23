@@ -2,9 +2,7 @@ package canvas;
 
 import model.xml.Project;
 
-import java.awt.image.RenderedImage;
 import java.io.File;
-import java.io.InputStream;
 
 public interface Canvas {
 

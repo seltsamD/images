@@ -1,8 +1,6 @@
 package processor;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.jboss.logging.Logger;
 
 import javax.enterprise.inject.Alternative;
@@ -12,8 +10,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+//TODO: remove Alternative and create qualifier for one of Canvas implementations
 @Alternative
-public class Graphic2DProcessor implements ImageProcessor{
+public class Graphic2DProcessor implements ImageProcessor {
 
     private static final Logger LOGGER = Logger.getLogger(Graphic2DProcessor.class);
 

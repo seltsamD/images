@@ -1,34 +1,32 @@
 package generator;
 
 import canvas.Canvas;
-import canvas.Canvas2D;
-import factory.CDIServicesFactory;
 import model.xml.BlockField;
 import model.xml.ImageField;
 import model.xml.Project;
 import model.xml.TextField;
 import org.jboss.logging.Logger;
-import processor.Graphic2DProcessor;
 import processor.ImageProcessor;
 import repository.ProjectRepository;
-import service.ConfigService;
 import util.ProjectUtils;
-import util.PropertyKeys;
 
 import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
-import java.awt.image.BufferedImage;
 import java.io.File;
 
 public class PreviewGenerator {
+    //TODO: make it private
     @Inject
     Canvas canvas;
     private Project project;
+    //TODO: make it private
     @Inject
     ImageProcessor imageProcessor;
 
     private static final Logger LOGGER = Logger.getLogger(PreviewGenerator.class);
 
+    //TODO remove this,
+    // if you don`t have other constructors this default constructor is useless
     public PreviewGenerator() {
 
     }

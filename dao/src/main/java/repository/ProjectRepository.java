@@ -6,8 +6,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.jboss.logging.Logger;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -86,6 +84,9 @@ public class ProjectRepository {
     }
 
     public File getThumbnail(String name, int height, int width) {
+        //TODO: Util class names could be skipped,
+        // its just a noise, FilenameUtils.getBaseName(name) -> getBaseName(name)
+        // the same with FileUtils
         String filename = FilenameUtils.getBaseName(name) + "_" + width + "_" + height + "." + FilenameUtils.getExtension(name);
         return projectDirectory.resolve("thumbnails").resolve(filename).toFile();
     }
@@ -94,10 +95,11 @@ public class ProjectRepository {
         return getFile(name);
     }
 
-    public File getProjectDirectory(){
+    public File getProjectDirectory() {
         return projectDirectory.toFile();
     }
 
+    //TODO: add here second argument, some enum for define type (pdf, png)
     public void savePreview(InputStream is) {
         try (OutputStream fos = new FileOutputStream(getPreview())) {
             IOUtils.copy(is, fos);
@@ -106,8 +108,10 @@ public class ProjectRepository {
         }
     }
 
+    //TODO: add here argument, some enum for define type (pdf, png)
     public File getPreview() {
-        String[] filter = new String[]{"pdf","png"};
+        //TODO: after adding type it will be easy resolve name of preview without filter
+        String[] filter = new String[]{"pdf", "png"};
         List<File> files = (List<File>) FileUtils.listFiles(projectDirectory.toFile(), filter, true);
         return files.get(0);
     }

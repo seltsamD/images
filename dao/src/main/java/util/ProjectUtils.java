@@ -10,6 +10,7 @@ import javax.xml.bind.Unmarshaller;
 import java.io.File;
 
 public class ProjectUtils {
+    //TODO: remove unused code
     private static final Logger LOGGER = Logger.getLogger(ProjectRepository.class);
     @SuppressWarnings("unchecked")
     public static <T> T getObject(File file, Class<T> c) throws JAXBException {

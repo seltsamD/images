@@ -3,8 +3,6 @@ package service;
 import canvas.CanvasBFO;
 import dao.ProjectDao;
 import dao.UserDao;
-import factory.CDIServicesFactory;
-import generator.PreviewGenerator;
 import model.db.Project;
 import model.db.User;
 import org.apache.commons.io.FilenameUtils;
@@ -32,6 +30,7 @@ public class ProjectService {
     @Inject
     private ProjectDao projectDao;
 
+    //TODO: make it private
     @Inject
     UserDao userDao;
 
@@ -46,7 +45,7 @@ public class ProjectService {
     private ProjectRepositoryFactory servicesFactory;
 
     private static final Logger LOGGER = Logger.getLogger(CanvasBFO.class);
-
+    //TODO: make it private
     @Inject
     ConfigService configService;
 
@@ -78,7 +77,7 @@ public class ProjectService {
         try {
             Connection connection = connectionFactory.createConnection();
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            MessageProducer messageProducer = (MessageProducer) session.createProducer(queue);
+            MessageProducer messageProducer = session.createProducer(queue);
             TextMessage textMessage = session.createTextMessage();
             textMessage.setObjectProperty("userId", userId);
             textMessage.setStringProperty("projectId", String.valueOf(project.getId()));
@@ -94,9 +93,13 @@ public class ProjectService {
     public byte[] getPreviewBody(String username, String projectName) {
         User user = userDao.findByUsername(username);
         Project project = projectDao.getByProjectName(projectName);
+        //TODO: .getPreview() now will be used with additional parameter PNG_TYPE
         File file = servicesFactory.create(user, project).getPreview();
         if (file == null || !file.exists())
             return null;
+
+
+        //TODO: move image data preparation to util class
 
         byte[] imageData = null;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
@@ -110,6 +113,8 @@ public class ProjectService {
         return imageData;
     }
 
+    //TODO: remove this
+    // its better to replace project so there are no need in this method
     public boolean isUniqueName(String projectName) {
         return projectDao.isUniqueName(projectName);
     }
