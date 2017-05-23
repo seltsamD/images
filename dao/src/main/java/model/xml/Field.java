@@ -5,22 +5,20 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlValue;
 
-//TODO: here was absent XmlAccessType.FIELD
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class Field {
     @XmlValue
     private String value;
 
-    //TODO: remove (name = "someName") if someName is name of the annotated field
     @XmlAttribute(name = "x")
     private int x;
-    //TODO: remove (name = "someName") if someName is name of the annotated field
+
     @XmlAttribute(name = "y")
     private int y;
-    //TODO: remove (name = "someName") if someName is name of the annotated field
+
     @XmlAttribute(name = "width")
     private int width;
-    //TODO: remove (name = "someName") if someName is name of the annotated field
+
     @XmlAttribute(name = "height")
     private int height;
 

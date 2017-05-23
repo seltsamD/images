@@ -2,10 +2,12 @@ package generator;
 
 import canvas.Canvas;
 import canvas.Canvas2D;
+import factory.CDIServicesFactory;
 import model.xml.BlockField;
 import model.xml.ImageField;
 import model.xml.Project;
 import model.xml.TextField;
+import org.jboss.logging.Logger;
 import processor.Graphic2DProcessor;
 import processor.ImageProcessor;
 import repository.ProjectRepository;
@@ -13,87 +15,91 @@ import service.ConfigService;
 import util.ProjectUtils;
 import util.PropertyKeys;
 
+import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
 public class PreviewGenerator {
-    //TODO: make it private
+    @Inject
     Canvas canvas;
-    Project project;
-    ProjectRepository repository;
+    private Project project;
+    @Inject
     ImageProcessor imageProcessor;
 
+    private static final Logger LOGGER = Logger.getLogger(PreviewGenerator.class);
 
-    //TODO: lets rework this bean, make it as cdi bean
-    // add @Injects of Canvas and ImageProcessor here
-    public PreviewGenerator(ProjectRepository repository, ConfigService configService) {
-        this.repository = repository;
+    public PreviewGenerator() {
+
+    }
+
+    private void prepareProject(ProjectRepository repository) {
         File xmlFile = repository.getXML();
         try {
             this.project = ProjectUtils.getObject(xmlFile, Project.class);
         } catch (JAXBException e) {
-            e.printStackTrace();
+            LOGGER.error("Error at the process of build project from xml. " + e.getMessage());
         }
-
-        if (configService.getBoolean(PropertyKeys.GRAPHIC_2D)) {
-            this.imageProcessor = new Graphic2DProcessor();
-            BufferedImage imageBI = new BufferedImage(project.getWidth(), project.getHeight(), BufferedImage.TYPE_INT_ARGB);
-            this.canvas = new Canvas2D(imageBI);
-        }
-
+        canvas.prepare(project);
     }
 
-    //TODO: let generate() will have ProjectRepo as argument and call prepareImages() func on this repo
-    public void generate() {
+    public void generate(ProjectRepository repository) {
+        prepareProject(repository);
+        prepareImages(repository);
+
         if (project.getImageFields() != null)
             for (ImageField image : project.getImageFields()) {
-                File outFile = repository.getImagePathForThumbnail(image.getImageRef());
+                File outFile = repository.getThumbnail(image.getImageRef(), image.getHeight(), image.getWidth());
                 canvas.drawImage(image.getX(), image.getY(), outFile);
             }
 
-        if(project.getBlocks() != null)
-        for (BlockField blockField : project.getBlocks()) {
-            if (blockField.getImageFields() != null)
-                for (ImageField image : blockField.getImageFields()) {
-                    File outFile = repository.getPathForThumbnail(image.getImageRef(), image.getHeight(), image.getWidth());
-                    canvas.drawImage(image.getX(), image.getY(), outFile);
-                }
-        }
+        if (project.getBlocks() != null)
+            for (BlockField blockField : project.getBlocks()) {
+                drawInBlock(blockField, repository);
+            }
 
         if (project.getTextFields() != null)
             for (TextField textField : project.getTextFields()) {
                 canvas.drawText(textField.getX(), textField.getY(), textField.getValue());
             }
 
-        repository.savePreview(canvas.build());
+        canvas.build(repository.getProjectDirectory());
 
     }
 
-    //TODO: let prepareImages() will have ProjectRepo as argument, and make it private
-    public void prepareImages() {
+    private void prepareImages(ProjectRepository repository) {
         if (project.getImageFields() != null)
             for (ImageField image : project.getImageFields()) {
-                File target = repository.getPathForThumbnail(image.getImageRef(), image.getHeight(), image.getWidth());
-                File source = repository.getImagePathForThumbnail(image.getImageRef());
-                repository.saveImage(imageProcessor.scale(source, target, image.getWidth(), image.getHeight()), target.getName());
+                File target = repository.getThumbnail(image.getImageRef(), image.getHeight(), image.getWidth());
+                File source = repository.getImage(image.getImageRef());
+                imageProcessor.scale(source, target, image.getWidth(), image.getHeight());
             }
         if (project.getBlocks() != null)
             for (BlockField blockField : project.getBlocks()) {
-                prepareInBlock(blockField);
+                prepareInBlock(blockField, repository);
             }
     }
 
-    //TODO: make it private
-    public void prepareInBlock(BlockField block) {
+    private void prepareInBlock(BlockField block, ProjectRepository repository) {
         if (block.getImageFields() != null)
             for (ImageField image : block.getImageFields()) {
-                File target = repository.getPathForThumbnail(image.getImageRef(), image.getHeight(), image.getWidth());
-                File source = repository.getImagePathForThumbnail(image.getImageRef());
+                File target = repository.getThumbnail(image.getImageRef(), image.getHeight(), image.getWidth());
+                File source = repository.getImage(image.getImageRef());
                 imageProcessor.scale(source, target, image.getWidth(), image.getHeight());
             }
         if (block.getBlocks() != null)
-            prepareInBlock(block);
+            prepareInBlock(block, repository);
+    }
+
+    private void drawInBlock(BlockField block, ProjectRepository repository) {
+            if (block.getImageFields() != null)
+                for (ImageField image : block.getImageFields()) {
+                    File outFile = repository.getThumbnail(image.getImageRef(), image.getHeight(), image.getWidth());
+                    canvas.drawImage(image.getX(), image.getY(), outFile);
+                }
+
+        if (block.getBlocks() != null)
+            drawInBlock(block, repository);
     }
 }
 

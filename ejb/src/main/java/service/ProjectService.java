@@ -2,16 +2,19 @@ package service;
 
 import dao.ProjectDao;
 import dao.UserDao;
-import factory.CDIProjectRepositoryFactory;
+import factory.CDIServicesFactory;
 import generator.PreviewGenerator;
 import model.db.Project;
 import model.db.User;
 import org.apache.commons.io.FilenameUtils;
 import repository.ProjectRepository;
+import repository.ProjectRepositoryFactory;
 
+import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
+import javax.jms.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -20,6 +23,7 @@ import java.io.InputStream;
 import java.util.Base64;
 import java.util.List;
 
+
 @Stateless
 public class ProjectService {
 
@@ -27,15 +31,16 @@ public class ProjectService {
     private ProjectDao projectDao;
 
     @Inject
-    private UserDao userDao;
+    UserDao userDao;
+
 
     @Inject
-    private CDIProjectRepositoryFactory projectsFactory;
+    private ProjectRepositoryFactory servicesFactory;
 
-    //TODO; read, comments inside PreviewGenerator, use Inject here
-    PreviewGenerator previewGenerator;
+    @Inject PreviewGenerator previewGenerator;
 
-    @Inject ConfigService configService;
+    @Inject
+    ConfigService configService;
 
 
     public List<Project> findAll() {
@@ -48,7 +53,7 @@ public class ProjectService {
 
     public void delete(long id) {
         Project project = projectDao.findById(id);
-        projectsFactory.createFactory().create(project.getUser(), project).deleteProject();
+        servicesFactory.create(project.getUser(), project).deleteProject();
         projectDao.delete(project);
     }
 
@@ -56,11 +61,9 @@ public class ProjectService {
     public void save(long userId, String fileName, InputStream inputStream) {
         Project project = projectDao.save(FilenameUtils.getBaseName(fileName), userDao.findById(userId));
         User user = userDao.findById(userId);
-        ProjectRepository projectRepository = projectsFactory.createFactory().create(user, project);
+        ProjectRepository projectRepository = servicesFactory.create(user, project);
         projectRepository.unzipProject(inputStream);
-        previewGenerator = new PreviewGenerator(projectRepository, configService);
-        previewGenerator.prepareImages();
-        previewGenerator.generate();
+        previewGenerator.generate(projectRepository);
 
     }
 
@@ -68,7 +71,7 @@ public class ProjectService {
     public byte[] getPreviewBody(String username, String projectName) {
         User user = userDao.findByUsername(username);
         Project project = projectDao.getByProjectName(projectName);
-        File file = projectsFactory.createFactory().create(user, project).callPreview();
+        File file = servicesFactory.create(user, project).getPreview();
         if (file == null || !file.exists())
             return null;
 
@@ -84,7 +87,7 @@ public class ProjectService {
         return imageData;
     }
 
-    public boolean isUniqueName(String projectName){
+    public boolean isUniqueName(String projectName) {
         return projectDao.isUniqueName(projectName);
     }
 

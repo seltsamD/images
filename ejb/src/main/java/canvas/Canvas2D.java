@@ -1,20 +1,34 @@
 package canvas;
 
+import model.xml.Project;
+import org.jboss.logging.Logger;
+import repository.ProjectRepository;
+
+import javax.enterprise.inject.Alternative;
 import javax.imageio.ImageIO;
+import javax.inject.Qualifier;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.file.Paths;
 
 import static java.awt.Color.BLACK;
 
+@Alternative
 public class Canvas2D implements Canvas {
-    //TODO: make it private
-    Graphics2D graphics;
-    BufferedImage image;
 
-    public Canvas2D(BufferedImage bufferedImage) {
-        this.image = bufferedImage;
-        this.graphics = image.createGraphics();
+    private static final Logger LOGGER = Logger.getLogger(Canvas2D.class);
+    private Graphics2D graphics;
+    private BufferedImage image;
+
+    public Canvas2D() {
+    }
+
+
+    @Override
+    public void prepare(Project project) {
+        this.image = new BufferedImage(project.getWidth(), project.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        graphics = image.createGraphics();
     }
 
     @Override
@@ -30,21 +44,18 @@ public class Canvas2D implements Canvas {
             BufferedImage buf = ImageIO.read(file);
             graphics.drawImage(buf, x, y, buf.getWidth(), buf.getHeight(), null);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error at process of draw image " + e.getMessage());
         }
     }
 
     @Override
-    public InputStream build() {
-        ByteArrayInputStream  result = null;
-        try (ByteArrayOutputStream baos  = new ByteArrayOutputStream()){
-            ImageIO.write(image, "png", baos);
-            result =  new ByteArrayInputStream(baos.toByteArray());
+    public void build(File file) {
+        try {
+            File result = Paths.get(file.toURI()).resolve("preview.png").toFile();
+            ImageIO.write(image, "png", new FileOutputStream(result));
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error at process of build preview " + e.getMessage());
         }
-        return result;
     }
-
 
 }

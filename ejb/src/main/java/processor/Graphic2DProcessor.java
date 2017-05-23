@@ -4,13 +4,17 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
+import javax.enterprise.inject.Alternative;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+@Alternative
 public class Graphic2DProcessor implements ImageProcessor{
+
+
     @Override
     public File scale(File source, File target, int width, int height) {
         try {
