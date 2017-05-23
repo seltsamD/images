@@ -1,7 +1,14 @@
 package mdb;
 
 
+import generator.PreviewGenerator;
+import model.db.Project;
+import model.db.User;
+import org.jboss.logging.Logger;
+import repository.ProjectRepository;
+import repository.ProjectRepositoryFactory;
 import service.ProjectService;
+import service.UserService;
 
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
@@ -20,13 +27,25 @@ public class ProjectResourceMdb implements MessageListener {
     @Inject
     private ProjectService projectService;
 
+    @Inject
+    private UserService userService;
+
+    @Inject
+    private ProjectRepositoryFactory servicesFactory;
+
+    @Inject
+    PreviewGenerator previewGenerator;
+
+    private static final Logger LOGGER = Logger.getLogger(ProjectResourceMdb.class);
+
     public void onMessage(Message inMessage) {
         try {
-            String userId = inMessage.getStringProperty("userId");
-            String projectName = inMessage.getStringProperty("projectName");
-//            projectService.generatePreview(userId, projectName);
+            Project project = projectService.getById(Long.parseLong(inMessage.getStringProperty("projectId")));
+            User user = userService.getById(Long.parseLong(inMessage.getStringProperty("userId")));
+            ProjectRepository projectRepository = servicesFactory.create(user, project);
+            previewGenerator.generate(projectRepository);
         } catch (JMSException e) {
-            e.printStackTrace();
+            LOGGER.error("Error at process of async generate preview" + e.getMessage());
         }
 
 

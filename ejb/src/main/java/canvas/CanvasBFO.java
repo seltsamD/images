@@ -2,6 +2,7 @@ package canvas;
 
 import model.xml.Project;
 import org.faceless.pdf2.*;
+import org.jboss.logging.Logger;
 
 import javax.enterprise.inject.Alternative;
 import java.awt.*;
@@ -16,6 +17,7 @@ public class CanvasBFO implements Canvas {
     private PDF pdf;
     private PDFPage page;
     private PDFCanvas canvas;
+    private static final Logger LOGGER = Logger.getLogger(CanvasBFO.class);
 
     @Override
     public void prepare(Project project) {
@@ -44,20 +46,18 @@ public class CanvasBFO implements Canvas {
             canvas.drawImage(image, x, y, width, height);
             canvas.flush();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error at process of draw image" + e.getMessage());
         }
     }
 
 
     @Override
     public void build(File file) {
-        try {
+        try (FileOutputStream stream = new FileOutputStream(Paths.get(file.toURI()).resolve("preview.pdf").toFile())) {
             page.drawCanvas(canvas, 0, 0, canvas.getWidth(), canvas.getHeight());
-            page.flush();
-            File result = Paths.get(file.toURI()).resolve("preview.pdf").toFile();
-            pdf.render(new FileOutputStream(result));
+            pdf.render(stream);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error at process of build preview PDF" + e.getMessage());
         }
     }
 }

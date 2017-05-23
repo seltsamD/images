@@ -1,6 +1,7 @@
 package processor;
 
 import org.apache.commons.io.FileUtils;
+import org.jboss.logging.Logger;
 import service.ConfigService;
 import util.PropertyKeys;
 
@@ -12,7 +13,9 @@ import java.io.IOException;
 @Alternative
 public class ImageMagicProcessor implements ImageProcessor {
 
-    String imageMagicPath;
+    private static final Logger LOGGER = Logger.getLogger(ImageMagicProcessor.class);
+
+    private String imageMagicPath;
 
     public ImageMagicProcessor(String imageMagicPath) {
         this.imageMagicPath = imageMagicPath;
@@ -31,7 +34,7 @@ public class ImageMagicProcessor implements ImageProcessor {
         try {
             Process p = pb.start();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error at process of cale image with ImageMagick " + e.getMessage());
         }
         return target;
     }

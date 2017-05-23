@@ -1,5 +1,6 @@
 package service;
 
+import canvas.CanvasBFO;
 import dao.ProjectDao;
 import dao.UserDao;
 import factory.CDIServicesFactory;
@@ -7,6 +8,7 @@ import generator.PreviewGenerator;
 import model.db.Project;
 import model.db.User;
 import org.apache.commons.io.FilenameUtils;
+import org.jboss.logging.Logger;
 import repository.ProjectRepository;
 import repository.ProjectRepositoryFactory;
 
@@ -34,10 +36,16 @@ public class ProjectService {
     UserDao userDao;
 
 
+    @Resource(mappedName = "java:/ConnectionFactory")
+    private ConnectionFactory connectionFactory;
+
+    @Resource(mappedName = "java:/jms/queue/projectQueue")
+    private Queue queue;
+
     @Inject
     private ProjectRepositoryFactory servicesFactory;
 
-    @Inject PreviewGenerator previewGenerator;
+    private static final Logger LOGGER = Logger.getLogger(CanvasBFO.class);
 
     @Inject
     ConfigService configService;
@@ -57,13 +65,28 @@ public class ProjectService {
         projectDao.delete(project);
     }
 
+    public Project getById(long id) {
+        return projectDao.findById(id);
+    }
+
 
     public void save(long userId, String fileName, InputStream inputStream) {
         Project project = projectDao.save(FilenameUtils.getBaseName(fileName), userDao.findById(userId));
         User user = userDao.findById(userId);
         ProjectRepository projectRepository = servicesFactory.create(user, project);
         projectRepository.unzipProject(inputStream);
-        previewGenerator.generate(projectRepository);
+        try {
+            Connection connection = connectionFactory.createConnection();
+            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            MessageProducer messageProducer = (MessageProducer) session.createProducer(queue);
+            TextMessage textMessage = session.createTextMessage();
+            textMessage.setObjectProperty("userId", userId);
+            textMessage.setStringProperty("projectId", String.valueOf(project.getId()));
+            messageProducer.send(textMessage);
+        } catch (JMSException e) {
+            LOGGER.error("Error at process of send message " + e.getMessage());
+        }
+
 
     }
 
@@ -81,7 +104,7 @@ public class ProjectService {
             ImageIO.write(image, "png", baos);
             imageData = Base64.getEncoder().encode(baos.toByteArray());
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error at process get preview body " + e.getMessage());
         }
 
         return imageData;

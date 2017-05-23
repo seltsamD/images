@@ -3,6 +3,7 @@ package processor;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.jboss.logging.Logger;
 
 import javax.enterprise.inject.Alternative;
 import javax.imageio.ImageIO;
@@ -14,6 +15,7 @@ import java.io.IOException;
 @Alternative
 public class Graphic2DProcessor implements ImageProcessor{
 
+    private static final Logger LOGGER = Logger.getLogger(Graphic2DProcessor.class);
 
     @Override
     public File scale(File source, File target, int width, int height) {
@@ -26,7 +28,7 @@ public class Graphic2DProcessor implements ImageProcessor{
             ImageIO.write(outputImage, FilenameUtils.getExtension(source.getName()), target);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error at process of scale image with Graphic2d " + e.getMessage());
         }
 
         return target;

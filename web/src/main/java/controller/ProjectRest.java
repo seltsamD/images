@@ -2,6 +2,7 @@ package controller;
 
 import model.db.Project;
 import org.apache.commons.io.FilenameUtils;
+import org.jboss.logging.Logger;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import service.ProjectService;
@@ -29,6 +30,8 @@ public class ProjectRest {
 
     @Context
     private SecurityContext context;
+
+    private static final Logger LOGGER = Logger.getLogger(ProjectRest.class);
 
     @GET
     @Produces("application/json")
@@ -75,14 +78,14 @@ public class ProjectRest {
             else return Response.noContent().build();
 
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error at process of upload project " + e.getMessage());
         }
 
         URI url = null;
         try {
             url = new URI("../");
         } catch (URISyntaxException e) {
-            e.printStackTrace();
+            LOGGER.error("Error at process of crate URI " + e.getMessage());
         }
         return Response.seeOther(url).build();
     }
