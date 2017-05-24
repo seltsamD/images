@@ -12,6 +12,7 @@
     <properties>
         <version.wildfly.maven.plugin>1.0.2.Final</version.wildfly.maven.plugin>
         <versiom.hibernate>5.2.10</versiom.hibernate>
+        <bfo.version>2.17.1-r21770</bfo.version>
     </properties>
 
     <modules>
@@ -51,11 +52,16 @@
                 <artifactId>commons-io</artifactId>
                 <version>2.4</version>
             </dependency>
-
-
         </dependencies>
 
     </dependencyManagement>
+    <repositories>
+        <repository>
+            <id>avery-release-repository</id>
+            <name>External Nexus repository for release artifacts</name>
+            <url>http://repo.ec2.avery.com/nexus/content/repositories/releases/</url>
+        </repository>
+    </repositories>
     <build>
         <finalName>images</finalName>
         <plugins>

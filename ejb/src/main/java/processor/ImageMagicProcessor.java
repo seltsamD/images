@@ -5,9 +5,10 @@ import org.jboss.logging.Logger;
 import javax.enterprise.inject.Alternative;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
-//TODO: remove Alternative and create qualifier for one of Canvas implementations
-@Alternative
+@ImgMagickQualifier
 public class ImageMagicProcessor implements ImageProcessor {
 
     private static final Logger LOGGER = Logger.getLogger(ImageMagicProcessor.class);
@@ -20,19 +21,12 @@ public class ImageMagicProcessor implements ImageProcessor {
 
     @Override
     public File scale(File source, File target, int width, int height) {
-        //TODO: replace next lines with Arrays.asList()
-        // it will be more readable
-        /*List<String> command = Arrays.asList(
-                "convert",
-                "file.png",
-                "file.jpg"
-        );*/
-        String command = imageMagicPath + "\\convert";
-        String sourcePath = source.getAbsolutePath();
-        String targetPath = target.getAbsolutePath();
-        String com = "-resize";
-        String scale = String.valueOf(width) + "x" + String.valueOf(height) + "!";
-        ProcessBuilder pb = new ProcessBuilder(command, sourcePath, com, scale, targetPath);
+        List<String> commands = Arrays.asList(imageMagicPath + "\\convert",
+                source.getAbsolutePath(),
+                "-resize",
+                String.valueOf(width) + "x" + String.valueOf(height) + "!",
+                target.getAbsolutePath());
+        ProcessBuilder pb = new ProcessBuilder(commands);
         pb.directory(new File(imageMagicPath));
         try {
             Process p = pb.start();

@@ -2,9 +2,9 @@ package repository;
 
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.jboss.logging.Logger;
+import util.ProjectUtils;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -12,6 +12,9 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import static org.apache.commons.io.FilenameUtils.getBaseName;
+import static org.apache.commons.io.FilenameUtils.getExtension;
 
 public class ProjectRepository {
     //NOTE
@@ -84,10 +87,7 @@ public class ProjectRepository {
     }
 
     public File getThumbnail(String name, int height, int width) {
-        //TODO: Util class names could be skipped,
-        // its just a noise, FilenameUtils.getBaseName(name) -> getBaseName(name)
-        // the same with FileUtils
-        String filename = FilenameUtils.getBaseName(name) + "_" + width + "_" + height + "." + FilenameUtils.getExtension(name);
+        String filename = getBaseName(name) + "_" + width + "_" + height + "." + getExtension(name);
         return projectDirectory.resolve("thumbnails").resolve(filename).toFile();
     }
 
@@ -99,21 +99,8 @@ public class ProjectRepository {
         return projectDirectory.toFile();
     }
 
-    //TODO: add here second argument, some enum for define type (pdf, png)
-    public void savePreview(InputStream is) {
-        try (OutputStream fos = new FileOutputStream(getPreview())) {
-            IOUtils.copy(is, fos);
-        } catch (IOException e) {
-            LOGGER.error("Error at process of save preview  " + e.getMessage());
-        }
-    }
-
-    //TODO: add here argument, some enum for define type (pdf, png)
-    public File getPreview() {
-        //TODO: after adding type it will be easy resolve name of preview without filter
-        String[] filter = new String[]{"pdf", "png"};
-        List<File> files = (List<File>) FileUtils.listFiles(projectDirectory.toFile(), filter, true);
-        return files.get(0);
+    public File getPreview(ProjectUtils.PREVIEW_TYPES type) {
+        return projectDirectory.resolve("preview." + type).toFile();
     }
 
     public void deleteProject() {

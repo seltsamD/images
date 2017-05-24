@@ -5,10 +5,12 @@ import dao.ProjectDao;
 import dao.UserDao;
 import model.db.Project;
 import model.db.User;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.jboss.logging.Logger;
 import repository.ProjectRepository;
 import repository.ProjectRepositoryFactory;
+import util.ProjectUtils;
 
 import javax.annotation.Resource;
 import javax.ejb.Stateless;
@@ -30,9 +32,8 @@ public class ProjectService {
     @Inject
     private ProjectDao projectDao;
 
-    //TODO: make it private
     @Inject
-    UserDao userDao;
+    private UserDao userDao;
 
 
     @Resource(mappedName = "java:/ConnectionFactory")
@@ -45,9 +46,9 @@ public class ProjectService {
     private ProjectRepositoryFactory servicesFactory;
 
     private static final Logger LOGGER = Logger.getLogger(CanvasBFO.class);
-    //TODO: make it private
+
     @Inject
-    ConfigService configService;
+    private ConfigService configService;
 
 
     public List<Project> findAll() {
@@ -93,30 +94,11 @@ public class ProjectService {
     public byte[] getPreviewBody(String username, String projectName) {
         User user = userDao.findByUsername(username);
         Project project = projectDao.getByProjectName(projectName);
-        //TODO: .getPreview() now will be used with additional parameter PNG_TYPE
-        File file = servicesFactory.create(user, project).getPreview();
+        File file = servicesFactory.create(user, project).getPreview(ProjectUtils.PREVIEW_TYPES.PNG);
         if (file == null || !file.exists())
             return null;
-
-
-        //TODO: move image data preparation to util class
-
-        byte[] imageData = null;
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            BufferedImage image = ImageIO.read(file);
-            ImageIO.write(image, "png", baos);
-            imageData = Base64.getEncoder().encode(baos.toByteArray());
-        } catch (IOException e) {
-            LOGGER.error("Error at process get preview body " + e.getMessage());
-        }
-
-        return imageData;
+        return ProjectUtils.prepareImage(file);
     }
 
-    //TODO: remove this
-    // its better to replace project so there are no need in this method
-    public boolean isUniqueName(String projectName) {
-        return projectDao.isUniqueName(projectName);
-    }
 
 }

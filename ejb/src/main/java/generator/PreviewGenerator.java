@@ -15,21 +15,14 @@ import javax.xml.bind.JAXBException;
 import java.io.File;
 
 public class PreviewGenerator {
-    //TODO: make it private
+
     @Inject
-    Canvas canvas;
+    private Canvas canvas;
     private Project project;
-    //TODO: make it private
     @Inject
-    ImageProcessor imageProcessor;
+    private ImageProcessor imageProcessor;
 
     private static final Logger LOGGER = Logger.getLogger(PreviewGenerator.class);
-
-    //TODO remove this,
-    // if you don`t have other constructors this default constructor is useless
-    public PreviewGenerator() {
-
-    }
 
     private void prepareProject(ProjectRepository repository) {
         File xmlFile = repository.getXML();
@@ -61,7 +54,7 @@ public class PreviewGenerator {
                 canvas.drawText(textField.getX(), textField.getY(), textField.getValue());
             }
 
-        canvas.build(repository.getProjectDirectory());
+        canvas.build(repository);
 
     }
 

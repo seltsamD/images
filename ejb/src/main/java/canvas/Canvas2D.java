@@ -2,6 +2,8 @@ package canvas;
 
 import model.xml.Project;
 import org.jboss.logging.Logger;
+import repository.ProjectRepository;
+import util.ProjectUtils;
 
 import javax.enterprise.inject.Alternative;
 import javax.imageio.ImageIO;
@@ -14,8 +16,7 @@ import java.nio.file.Paths;
 
 import static java.awt.Color.BLACK;
 
-//TODO: remove Alternative and create qualifier for one of Canvas implementations
-@Alternative
+@Canvas2DQualifier
 public class Canvas2D implements Canvas {
 
     private static final Logger LOGGER = Logger.getLogger(Canvas2D.class);
@@ -49,14 +50,11 @@ public class Canvas2D implements Canvas {
         }
     }
 
-    //TODO: set first argument ProjectRepository
-    // after that you could just call
-    // ImageIO.write(image, "png", new FileOutputStream(repo.getPreview(PNG_TYPE)));
+
     @Override
-    public void build(File file) {
+    public void build(ProjectRepository repository) {
         try {
-            File result = Paths.get(file.toURI()).resolve("preview.png").toFile();
-            ImageIO.write(image, "png", new FileOutputStream(result));
+            ImageIO.write(image, "png", new FileOutputStream(repository.getPreview(ProjectUtils.PREVIEW_TYPES.PNG)));
         } catch (IOException e) {
             LOGGER.error("Error at process of build preview " + e.getMessage());
         }

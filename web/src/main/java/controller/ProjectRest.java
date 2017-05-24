@@ -65,34 +65,19 @@ public class ProjectRest {
     @Path("/upload")
     @Consumes("multipart/form-data")
     @Produces("application/json")
-    public Response uploadFile(MultipartFormDataInput input) {
+    public Response uploadFile(MultipartFormDataInput input) throws IOException, URISyntaxException {
         long userId = userService.getIdByUsername(context.getUserPrincipal().getName());
         String projectName = null;
 
         InputPart inPart = input.getFormDataMap().get("file").get(0);
         try (InputStream istream = inPart.getBody(InputStream.class, null)){
             projectName = FileUtil.getFileName(inPart.getHeaders());
-            //TODO: remove if and on project name clash just replace old one,
-            // replace is more obvious
-            if(projectService.isUniqueName(FilenameUtils.getBaseName(projectName))){
-                projectService.save(userId, projectName, istream);
-            }
-            else return Response.noContent().build();
-
-            //TODO: remove try{}catch(){} blocks, let rest method throw exceptions
-            // use ExceptionMappers for handle errors on rest crash its common approach
-        } catch (IOException e) {
-            LOGGER.error("Error at process of upload project " + e.getMessage());
+            projectService.save(userId, projectName, istream);
         }
 
         URI url = null;
-        try {
-            url = new URI("../");
-            //TODO: remove try{}catch(){} blocks, let rest method throw exceptions
-            // use ExceptionMappers for handle errors on rest crash its common approach
-        } catch (URISyntaxException e) {
-            LOGGER.error("Error at process of crate URI " + e.getMessage());
-        }
+        url = new URI("../");
+
         return Response.seeOther(url).build();
     }
 

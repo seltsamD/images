@@ -3,17 +3,18 @@ package canvas;
 import model.xml.Project;
 import org.faceless.pdf2.*;
 import org.jboss.logging.Logger;
+import repository.ProjectRepository;
+import util.ProjectUtils;
 
-import javax.enterprise.inject.Alternative;
 import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Paths;
 
-//TODO: remove Alternative and create qualifier for one of Canvas implementations
-@Alternative
+import static org.apache.commons.io.IOUtils.closeQuietly;
+
+@BFOQualifier
 public class CanvasBFO implements Canvas {
     private PDF pdf;
     private PDFPage page;
@@ -39,30 +40,26 @@ public class CanvasBFO implements Canvas {
 
     @Override
     public void drawImage(int x, int y, File file) {
-        try {
+        try (FileInputStream fis = new FileInputStream(file)){
 
-            PDFImage image = new PDFImage(new FileInputStream(file));
+            PDFImage image = new PDFImage(fis);
             float width = image.getWidth();
             float height = image.getHeight();
             canvas.drawImage(image, x, y, width, height);
-            canvas.flush();
         } catch (IOException e) {
             LOGGER.error("Error at process of draw image" + e.getMessage());
         }
     }
 
-    //TODO: set first argument ProjectRepository
-    // after that you could just call
-    // pdf.render(new FileOutputStream(repo.getPreview(PDF_TYPE));
     @Override
-    public void build(File file) {
-        try (FileOutputStream stream = new FileOutputStream(Paths.get(file.toURI()).resolve("preview.pdf").toFile())) {
-            page.drawCanvas(canvas, 0, 0, canvas.getWidth(), canvas.getHeight());
+    public void build(ProjectRepository repository) {
+          page.drawCanvas(canvas, 0, 0, canvas.getWidth(), canvas.getHeight());
+            page.flush();
+        try (FileOutputStream stream = new FileOutputStream(repository.getPreview(ProjectUtils.PREVIEW_TYPES.PDF))){
             pdf.render(stream);
-            //TODO: pdf objects its some kind of closable it is important to close() it
-            // use IOUtils.closeQuietly();
-        } catch (IOException e) {
-            LOGGER.error("Error at process of build preview PDF" + e.getMessage());
+            closeQuietly(stream);
+        } catch (IOException e1) {
+            e1.printStackTrace();
         }
     }
 }

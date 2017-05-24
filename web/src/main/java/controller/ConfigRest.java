@@ -19,16 +19,6 @@ public class ConfigRest {
     @Inject
     private ConfigService configService;
 
-    //TODO: remove unused injects
-    @Inject
-    private UserService userService;
-
-    @Inject
-    private ProjectService projectService;
-
-    @Context
-    private SecurityContext context;
-
     @GET
     @Path("/full")
     @Produces("application/json")
